@@ -1,3 +1,5 @@
+import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
+import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
 import 'package:civic_app/shared/widgets/main_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,8 +19,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/articles',
-            builder: (context, state) =>
-                const Scaffold(body: Center(child: Text('Articles'))),
+            builder: (context, state) => const ArticlesPage(),
           ),
           GoRoute(
             path: '/appointments',
@@ -35,7 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/articles/:id',
         builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Article Detail'))),
+            ArticleDetailPage(articleId: state.pathParameters['id']!),
       ),
     ],
   );
