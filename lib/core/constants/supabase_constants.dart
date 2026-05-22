@@ -4,4 +4,5 @@ abstract final class SupabaseConstants {
   static const String pollsTable = 'polls';
   static const String pollOptionsTable = 'poll_options';
   static const String pollVotesTable = 'poll_votes';
+  static const String settingsTable = 'settings';
 }

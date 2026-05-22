@@ -1,5 +1,6 @@
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
+import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/shared/widgets/main_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,11 +13,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) => MainScaffold(child: child),
         routes: [
-          GoRoute(
-            path: '/home',
-            builder: (context, state) =>
-                const Scaffold(body: Center(child: Text('Home'))),
-          ),
+          GoRoute(path: '/home', builder: (context, state) => const HomePage()),
           GoRoute(
             path: '/articles',
             builder: (context, state) => const ArticlesPage(),
