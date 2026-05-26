@@ -1,3 +1,4 @@
+import 'package:civic_app/features/weather/presentation/widgets/weather_widget.dart';
 import 'package:flutter/material.dart';
 
 class WeatherSection extends StatelessWidget {
@@ -5,20 +6,6 @@ class WeatherSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            const Icon(Icons.wb_sunny_outlined, size: 40),
-            const SizedBox(width: 16),
-            Text(
-              'Weather coming soon',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
-      ),
-    );
+    return const WeatherWidget();
   }
 }
