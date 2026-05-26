@@ -9,20 +9,14 @@ class VillageNameWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(citySettingsProvider);
+    final titleStyle = Theme.of(
+      context,
+    ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold);
     return state.when(
       loading: () => const SizedBox.shrink(),
-      error: (error, stackTrace) => Text(
-        AppConstants.villageName,
-        style: Theme.of(
-          context,
-        ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-      ),
-      data: (settings) => Text(
-        settings.villageName,
-        style: Theme.of(
-          context,
-        ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-      ),
+      error: (error, stackTrace) =>
+          Text(AppConstants.villageName, style: titleStyle),
+      data: (settings) => Text(settings.villageName, style: titleStyle),
     );
   }
 }
