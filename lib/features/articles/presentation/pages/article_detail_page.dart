@@ -15,7 +15,8 @@ class ArticleDetailPage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Article')),
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text(error.toString())),
+        error: (error, stackTrace) =>
+            const Center(child: Text('Impossible de charger l\'article.')),
         data: (article) => SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -42,7 +43,7 @@ class ArticleDetailPage extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                DateFormat('MMM d, yyyy').format(article.publishedAt),
+                DateFormat('dd/MM/yyyy').format(article.publishedAt),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const Divider(height: 24),

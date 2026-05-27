@@ -11,12 +11,13 @@ class ArticlesPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(articlesControllerProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Articles')),
+      appBar: AppBar(title: const Text('Actualités')),
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text(error.toString())),
+        error: (error, stackTrace) =>
+            const Center(child: Text('Impossible de charger les articles.')),
         data: (articles) => articles.isEmpty
-            ? const Center(child: Text('No articles available.'))
+            ? const Center(child: Text('Aucun article disponible.'))
             : ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: articles.length,

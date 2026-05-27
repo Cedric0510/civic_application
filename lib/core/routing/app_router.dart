@@ -1,3 +1,4 @@
+import 'package:civic_app/features/appointments/presentation/pages/appointment_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
@@ -20,8 +21,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/appointments',
-            builder: (context, state) =>
-                const Scaffold(body: Center(child: Text('Appointments'))),
+            builder: (context, state) => const AppointmentPage(),
           ),
           GoRoute(
             path: '/polls',
