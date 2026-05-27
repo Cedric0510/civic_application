@@ -22,7 +22,7 @@ class AdminApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(adminRouterProvider);
     return MaterialApp.router(
-      title: 'Smart Dash Admin',
+      title: 'City-Co Admin',
       theme: AppTheme.light,
       routerConfig: router,
     );
