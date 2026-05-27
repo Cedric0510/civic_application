@@ -2,8 +2,8 @@ import 'package:civic_app/features/appointments/presentation/pages/appointment_p
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
+import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
 import 'package:civic_app/shared/widgets/main_scaffold.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,8 +25,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/polls',
-            builder: (context, state) =>
-                const Scaffold(body: Center(child: Text('Polls'))),
+            builder: (context, state) => const PollsPage(),
           ),
         ],
       ),
