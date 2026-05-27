@@ -120,17 +120,17 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
           TextFormField(
             controller: _emailController,
             decoration: const InputDecoration(
-              labelText: 'Email',
+              labelText: 'Adresse e-mail',
               border: OutlineInputBorder(),
             ),
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Email is required.';
+                return 'L\'adresse e-mail est requise.';
               }
               final emailRegex = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
               if (!emailRegex.hasMatch(value.trim())) {
-                return 'Enter a valid email.';
+                return 'Entrez une adresse e-mail valide.';
               }
               return null;
             },
