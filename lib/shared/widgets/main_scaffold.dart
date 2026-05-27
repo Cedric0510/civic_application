@@ -8,25 +8,25 @@ class MainScaffold extends StatelessWidget {
 
   static const List<_NavDestination> _destinations = [
     _NavDestination(
-      label: 'Home',
+      label: 'Accueil',
       icon: Icons.home_outlined,
       activeIcon: Icons.home,
       path: '/home',
     ),
     _NavDestination(
-      label: 'Articles',
+      label: 'Actualités',
       icon: Icons.article_outlined,
       activeIcon: Icons.article,
       path: '/articles',
     ),
     _NavDestination(
-      label: 'Appointment',
+      label: 'Rendez-vous',
       icon: Icons.calendar_today_outlined,
       activeIcon: Icons.calendar_today,
       path: '/appointments',
     ),
     _NavDestination(
-      label: 'Polls',
+      label: 'Sondages',
       icon: Icons.poll_outlined,
       activeIcon: Icons.poll,
       path: '/polls',

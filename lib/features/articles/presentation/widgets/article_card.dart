@@ -45,7 +45,7 @@ class ArticleCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    DateFormat('MMM d, yyyy').format(article.publishedAt),
+                    DateFormat('dd/MM/yyyy').format(article.publishedAt),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],

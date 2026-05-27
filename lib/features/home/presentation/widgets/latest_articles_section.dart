@@ -15,7 +15,7 @@ class LatestArticlesSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Latest News',
+          'Dernières actualités',
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -23,13 +23,14 @@ class LatestArticlesSection extends ConsumerWidget {
         const SizedBox(height: 12),
         state.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Text(error.toString()),
+          error: (error, stackTrace) =>
+              const Text('Impossible de charger les articles.'),
           data: (articles) {
             final latestArticles = articles
                 .take(AppConstants.homeArticlesCount)
                 .toList();
             if (latestArticles.isEmpty) {
-              return const Text('No articles available.');
+              return const Text('Aucun article disponible.');
             }
             return Column(
               children: latestArticles

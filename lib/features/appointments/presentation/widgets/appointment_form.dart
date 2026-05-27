@@ -84,12 +84,14 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
     ) {
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('An error occurred. Please try again.')),
+          const SnackBar(
+            content: Text('Une erreur est survenue. Veuillez réessayer.'),
+          ),
         );
       } else if (next is AsyncData && previous is AsyncLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Appointment request sent successfully!'),
+            content: Text('Demande de rendez-vous envoyée avec succès !'),
           ),
         );
         _reset();
@@ -106,12 +108,12 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
           TextFormField(
             controller: _nameController,
             decoration: const InputDecoration(
-              labelText: 'Full Name',
+              labelText: 'Nom complet',
               border: OutlineInputBorder(),
             ),
             textCapitalization: TextCapitalization.words,
             validator: (value) => value == null || value.trim().isEmpty
-                ? 'Full name is required.'
+                ? 'Le nom complet est requis.'
                 : null,
           ),
           const SizedBox(height: 16),
@@ -143,18 +145,19 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
             readOnly: true,
             onTap: _pickDate,
             decoration: const InputDecoration(
-              labelText: 'Preferred Date',
+              labelText: 'Date souhaitée',
               border: OutlineInputBorder(),
               suffixIcon: Icon(Icons.calendar_today_outlined),
             ),
-            validator: (_) =>
-                _selectedDate == null ? 'Please select a date.' : null,
+            validator: (_) => _selectedDate == null
+                ? 'Veuillez sélectionner une date.'
+                : null,
           ),
           const SizedBox(height: 16),
           TextFormField(
             controller: _messageController,
             decoration: const InputDecoration(
-              labelText: 'Message (optional)',
+              labelText: 'Message (facultatif)',
               border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
@@ -169,7 +172,7 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
                     width: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Book Appointment'),
+                : const Text('Prendre rendez-vous'),
           ),
         ],
       ),

@@ -21,7 +21,8 @@ class ServiceDropdown extends StatelessWidget {
           )
           .toList(),
       onChanged: onChanged,
-      validator: (value) => value == null ? 'Please select a service.' : null,
+      validator: (value) =>
+          value == null ? 'Veuillez sélectionner un service.' : null,
     );
   }
 }

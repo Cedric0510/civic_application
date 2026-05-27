@@ -7,7 +7,7 @@ class AppointmentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Book an Appointment')),
+      appBar: AppBar(title: const Text('Prendre rendez-vous')),
       body: const SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: AppointmentForm(),
