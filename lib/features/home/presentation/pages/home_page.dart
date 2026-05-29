@@ -1,5 +1,6 @@
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:civic_app/features/home/presentation/widgets/latest_articles_section.dart';
+import 'package:civic_app/features/home/presentation/widgets/articles_carousel.dart';
+import 'package:civic_app/features/home/presentation/widgets/navigation_tiles_grid.dart';
 import 'package:civic_app/features/home/presentation/widgets/village_name_widget.dart';
 import 'package:civic_app/features/home/presentation/widgets/weather_section.dart';
 import 'package:flutter/material.dart';
@@ -24,16 +25,26 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: const SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            VillageNameWidget(),
-            SizedBox(height: 24),
-            WeatherSection(),
-            SizedBox(height: 24),
-            LatestArticlesSection(),
+            const SizedBox(height: 12),
+            const ArticlesCarousel(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const VillageNameWidget(),
+                  const SizedBox(height: 16),
+                  const NavigationTilesGrid(),
+                  const SizedBox(height: 16),
+                  const WeatherSection(),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
           ],
         ),
       ),

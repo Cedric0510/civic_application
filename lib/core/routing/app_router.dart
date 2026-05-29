@@ -5,7 +5,6 @@ import 'package:civic_app/features/articles/presentation/pages/articles_page.dar
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
-import 'package:civic_app/shared/widgets/main_scaffold.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -36,29 +35,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => const AuthPage()),
-      ShellRoute(
-        builder: (context, state, child) => MainScaffold(child: child),
-        routes: [
-          GoRoute(path: '/home', builder: (context, state) => const HomePage()),
-          GoRoute(
-            path: '/articles',
-            builder: (context, state) => const ArticlesPage(),
-          ),
-          GoRoute(
-            path: '/appointments',
-            builder: (context, state) => const AppointmentPage(),
-          ),
-          GoRoute(
-            path: '/polls',
-            builder: (context, state) => const PollsPage(),
-          ),
-        ],
+      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+      GoRoute(
+        path: '/articles',
+        builder: (context, state) => const ArticlesPage(),
       ),
       GoRoute(
         path: '/articles/:id',
         builder: (context, state) =>
             ArticleDetailPage(articleId: state.pathParameters['id']!),
       ),
+      GoRoute(
+        path: '/appointments',
+        builder: (context, state) => const AppointmentPage(),
+      ),
+      GoRoute(path: '/polls', builder: (context, state) => const PollsPage()),
     ],
   );
 });

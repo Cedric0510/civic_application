@@ -41,8 +41,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   String _mapError(Object error) {
     final msg = error is AppException ? error.message : '';
-    if (msg.contains('Invalid login'))
+    if (msg.contains('Invalid login')) {
       return 'Email ou mot de passe incorrect.';
+    }
     if (msg.contains('already registered')) {
       return 'Cette adresse e-mail est déjà utilisée.';
     }

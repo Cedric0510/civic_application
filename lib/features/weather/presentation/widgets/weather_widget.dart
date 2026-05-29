@@ -8,68 +8,79 @@ class WeatherWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(weatherProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+
     return state.when(
-      loading: () => const Card(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
-      error: (error, stackTrace) => const Card(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(Icons.cloud_off_outlined, size: 40),
-              SizedBox(width: 16),
-              Text('Météo indisponible'),
-            ],
+      loading: () => const _WeatherTileSkeleton(),
+      error: (error, stackTrace) => const SizedBox.shrink(),
+      data: (weather) => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [colorScheme.primary, colorScheme.tertiary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(16),
         ),
-      ),
-      data: (weather) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              _WeatherIcon(iconCode: weather.iconCode),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${weather.temperature.round()}°C',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    weather.cityName,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${weather.temperature.round()}°',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
                     ),
-                    Text(
-                      weather.description,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.water_drop_outlined, size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${weather.humidity}%',
-                          style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    weather.description,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.water_drop_outlined,
+                        color: Colors.white70,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${weather.humidity}%',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
                         ),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.air, size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${weather.windSpeed.toStringAsFixed(1)} m/s',
-                          style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(width: 16),
+                      const Icon(Icons.air, color: Colors.white70, size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${weather.windSpeed.toStringAsFixed(1)} m/s',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            _WeatherIcon(iconCode: weather.iconCode),
+          ],
         ),
       ),
     );
@@ -95,10 +106,22 @@ class _WeatherIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      _iconFromCode(iconCode),
-      size: 48,
-      color: Theme.of(context).colorScheme.primary,
+    return Icon(_iconFromCode(iconCode), size: 64, color: Colors.white);
+  }
+}
+
+class _WeatherTileSkeleton extends StatelessWidget {
+  const _WeatherTileSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 110,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 }
