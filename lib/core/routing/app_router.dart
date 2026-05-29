@@ -5,6 +5,7 @@ import 'package:civic_app/features/articles/presentation/pages/articles_page.dar
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
+import 'package:civic_app/features/services/presentation/pages/services_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,6 +51,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const AppointmentPage(),
       ),
       GoRoute(path: '/polls', builder: (context, state) => const PollsPage()),
+      GoRoute(
+        path: '/services',
+        builder: (context, state) => const ServicesPage(),
+      ),
     ],
   );
 });

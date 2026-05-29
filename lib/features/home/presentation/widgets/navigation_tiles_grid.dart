@@ -27,7 +27,7 @@ class NavigationTilesGrid extends StatelessWidget {
       label: 'Services',
       icon: Icons.location_city_outlined,
       color: Color(0xFFFB8C00),
-      path: '/home',
+      path: '/services',
     ),
   ];
 
