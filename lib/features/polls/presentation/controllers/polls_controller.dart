@@ -5,8 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PollsController extends AsyncNotifier<List<Poll>> {
   @override
-  Future<List<Poll>> build() {
-    return ref.read(getActivePollsUseCaseProvider)();
+  Future<List<Poll>> build() async {
+    final polls = await ref.read(getActivePollsUseCaseProvider)();
+    final votes = await ref.read(getUserVotesUseCaseProvider)();
+    ref.read(votedPollsProvider.notifier).state = votes;
+    return polls;
   }
 
   Future<void> submitVote({
