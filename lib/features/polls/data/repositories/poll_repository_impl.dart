@@ -18,4 +18,7 @@ class PollRepositoryImpl implements PollRepository {
       PollVoteModel(pollId: vote.pollId, optionId: vote.optionId),
     );
   }
+
+  @override
+  Future<Map<String, String>> getUserVotes() => _datasource.getUserVotes();
 }

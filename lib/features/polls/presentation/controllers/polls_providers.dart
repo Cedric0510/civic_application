@@ -3,6 +3,7 @@ import 'package:civic_app/features/polls/data/datasources/poll_supabase_datasour
 import 'package:civic_app/features/polls/data/repositories/poll_repository_impl.dart';
 import 'package:civic_app/features/polls/domain/repositories/poll_repository.dart';
 import 'package:civic_app/features/polls/domain/usecases/get_active_polls_usecase.dart';
+import 'package:civic_app/features/polls/domain/usecases/get_user_votes_usecase.dart';
 import 'package:civic_app/features/polls/domain/usecases/submit_vote_usecase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,6 +21,10 @@ final getActivePollsUseCaseProvider = Provider<GetActivePollsUseCase>((ref) {
 
 final submitVoteUseCaseProvider = Provider<SubmitVoteUseCase>((ref) {
   return SubmitVoteUseCase(ref.watch(pollRepositoryProvider));
+});
+
+final getUserVotesUseCaseProvider = Provider<GetUserVotesUseCase>((ref) {
+  return GetUserVotesUseCase(ref.watch(pollRepositoryProvider));
 });
 
 final votedPollsProvider = StateProvider<Map<String, String>>((ref) => {});
