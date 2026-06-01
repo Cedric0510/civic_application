@@ -367,4 +367,3 @@ Le router est un `Provider<GoRouter>`. Il écoute `authStateProvider` (un `Strea
 
 ---
 
-*Projet réalisé dans le cadre de l'année scolaire 2025-2026.*
