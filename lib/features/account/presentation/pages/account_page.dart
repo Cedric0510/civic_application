@@ -3,6 +3,7 @@ import 'package:civic_app/features/account/presentation/controllers/account_cont
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
 import 'package:civic_app/features/account/presentation/widgets/account_appointment_card.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:civic_app/shared/widgets/error_retry_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -57,65 +58,74 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     });
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 80,
-            pinned: true,
-            backgroundColor: _headerColor,
-            foregroundColor: Colors.white,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/home'),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(userProfileProvider);
+          ref.invalidate(userAppointmentsProvider);
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 80,
+              pinned: true,
+              backgroundColor: _headerColor,
+              foregroundColor: Colors.white,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.go('/home'),
+              ),
+              flexibleSpace: const FlexibleSpaceBar(
+                title: Text(
+                  'Mon compte',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+                titlePadding: EdgeInsets.only(left: 56, bottom: 12),
+                background: ColoredBox(color: _headerColor),
+              ),
             ),
-            flexibleSpace: const FlexibleSpaceBar(
-              title: Text(
-                'Mon compte',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 18,
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _UserInfoSection(email: authUser?.email),
+                    const SizedBox(height: 24),
+                    _CitySection(
+                      controller: _cityController,
+                      isLoading: isLoading,
+                      onSave: () {
+                        final city = _cityController.text.trim();
+                        if (city.isEmpty) return;
+                        ref
+                            .read(accountControllerProvider.notifier)
+                            .updateCity(city);
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    _AppointmentsSection(appointmentsAsync: appointmentsAsync),
+                    const SizedBox(height: 24),
+                    _DangerSection(
+                      isLoading: isLoading,
+                      onSignOut: () async {
+                        await ref
+                            .read(authControllerProvider.notifier)
+                            .signOut();
+                      },
+                      onDeleteAccount: () => _confirmDeleteAccount(context),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               ),
-              titlePadding: EdgeInsets.only(left: 56, bottom: 12),
-              background: ColoredBox(color: _headerColor),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _UserInfoSection(email: authUser?.email),
-                  const SizedBox(height: 24),
-                  _CitySection(
-                    controller: _cityController,
-                    isLoading: isLoading,
-                    onSave: () {
-                      final city = _cityController.text.trim();
-                      if (city.isEmpty) return;
-                      ref
-                          .read(accountControllerProvider.notifier)
-                          .updateCity(city);
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  _AppointmentsSection(appointmentsAsync: appointmentsAsync),
-                  const SizedBox(height: 24),
-                  _DangerSection(
-                    isLoading: isLoading,
-                    onSignOut: () async {
-                      await ref.read(authControllerProvider.notifier).signOut();
-                    },
-                    onDeleteAccount: () => _confirmDeleteAccount(context),
-                  ),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -287,9 +297,9 @@ class _AppointmentsSection extends ConsumerWidget {
               child: CircularProgressIndicator(),
             ),
           ),
-          error: (e, _) => Text(
-            'Erreur lors du chargement des rendez-vous.',
-            style: TextStyle(color: theme.colorScheme.error),
+          error: (e, _) => ErrorRetryWidget(
+            message: 'Impossible de charger les rendez-vous.',
+            onRetry: () => ref.invalidate(userAppointmentsProvider),
           ),
           data: (appointments) {
             if (appointments == null || (appointments as List).isEmpty) {
