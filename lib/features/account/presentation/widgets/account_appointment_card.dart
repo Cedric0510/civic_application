@@ -24,7 +24,11 @@ class AccountAppointmentCard extends StatelessWidget {
                 color: const Color(0xFFE53935).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.calendar_today, color: Color(0xFFE53935), size: 22),
+              child: const Icon(
+                Icons.calendar_today,
+                color: Color(0xFFE53935),
+                size: 22,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(

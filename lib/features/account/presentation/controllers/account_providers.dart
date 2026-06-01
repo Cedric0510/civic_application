@@ -31,19 +31,21 @@ final deleteAccountUseCaseProvider = Provider<DeleteAccountUseCase>((ref) {
   return DeleteAccountUseCase(ref.watch(accountRepositoryProvider));
 });
 
-final getUserAppointmentsUseCaseProvider =
-    Provider<GetUserAppointmentsUseCase>((ref) {
-      return GetUserAppointmentsUseCase(ref.watch(accountRepositoryProvider));
-    });
+final getUserAppointmentsUseCaseProvider = Provider<GetUserAppointmentsUseCase>(
+  (ref) {
+    return GetUserAppointmentsUseCase(ref.watch(accountRepositoryProvider));
+  },
+);
 
 final userProfileProvider = FutureProvider.autoDispose<UserProfile?>((ref) {
   return ref.watch(getUserProfileUseCaseProvider).call();
 });
 
-final userAppointmentsProvider =
-    FutureProvider.autoDispose<List<Appointment>>((ref) async {
-      final auth = ref.watch(authStateProvider);
-      final email = auth.valueOrNull?.email;
-      if (email == null) return [];
-      return ref.watch(getUserAppointmentsUseCaseProvider).call(email);
-    });
+final userAppointmentsProvider = FutureProvider.autoDispose<List<Appointment>>((
+  ref,
+) async {
+  final auth = ref.watch(authStateProvider);
+  final email = auth.valueOrNull?.email;
+  if (email == null) return [];
+  return ref.watch(getUserAppointmentsUseCaseProvider).call(email);
+});

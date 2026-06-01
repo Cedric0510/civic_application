@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AccountController extends StateNotifier<AsyncValue<void>> {
   AccountController(this._updateCity, this._deleteAccount)
-      : super(const AsyncData(null));
+    : super(const AsyncData(null));
 
   final UpdateCityUseCase _updateCity;
   final DeleteAccountUseCase _deleteAccount;
@@ -22,11 +22,11 @@ class AccountController extends StateNotifier<AsyncValue<void>> {
 }
 
 final accountControllerProvider =
-    StateNotifierProvider.autoDispose<AccountController, AsyncValue<void>>(
-      (ref) {
-        return AccountController(
-          ref.watch(updateCityUseCaseProvider),
-          ref.watch(deleteAccountUseCaseProvider),
-        );
-      },
-    );
+    StateNotifierProvider.autoDispose<AccountController, AsyncValue<void>>((
+      ref,
+    ) {
+      return AccountController(
+        ref.watch(updateCityUseCaseProvider),
+        ref.watch(deleteAccountUseCaseProvider),
+      );
+    });

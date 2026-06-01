@@ -95,7 +95,9 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                     onSave: () {
                       final city = _cityController.text.trim();
                       if (city.isEmpty) return;
-                      ref.read(accountControllerProvider.notifier).updateCity(city);
+                      ref
+                          .read(accountControllerProvider.notifier)
+                          .updateCity(city);
                     },
                   ),
                   const SizedBox(height: 24),
@@ -237,7 +239,10 @@ class _CitySection extends StatelessWidget {
               onPressed: isLoading ? null : onSave,
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF5E35B1),
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 20,
+                ),
               ),
               child: isLoading
                   ? const SizedBox(
@@ -291,7 +296,9 @@ class _AppointmentsSection extends ConsumerWidget {
               return Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.5,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -314,9 +321,8 @@ class _AppointmentsSection extends ConsumerWidget {
             return Column(
               children: appointments
                   .map(
-                    (appointment) => AccountAppointmentCard(
-                      appointment: appointment,
-                    ),
+                    (appointment) =>
+                        AccountAppointmentCard(appointment: appointment),
                   )
                   .toList(),
             );

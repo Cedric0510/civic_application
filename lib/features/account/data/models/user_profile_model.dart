@@ -11,9 +11,6 @@ class UserProfileModel extends UserProfile {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': userId,
-      'preferred_city': preferredCity,
-    };
+    return {'id': userId, 'preferred_city': preferredCity};
   }
 }
