@@ -1,4 +1,5 @@
 import 'package:civic_app/core/providers/auth_provider.dart';
+import 'package:civic_app/features/account/presentation/pages/account_page.dart';
 import 'package:civic_app/features/appointments/presentation/pages/appointment_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
@@ -54,6 +55,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/services',
         builder: (context, state) => const ServicesPage(),
+      ),
+      GoRoute(
+        path: '/account',
+        builder: (context, state) => const AccountPage(),
       ),
     ],
   );

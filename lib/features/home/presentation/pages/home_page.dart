@@ -1,10 +1,10 @@
-import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:civic_app/features/home/presentation/widgets/articles_carousel.dart';
 import 'package:civic_app/features/home/presentation/widgets/navigation_tiles_grid.dart';
 import 'package:civic_app/features/home/presentation/widgets/village_name_widget.dart';
 import 'package:civic_app/features/home/presentation/widgets/weather_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -17,10 +17,9 @@ class HomePage extends StatelessWidget {
         actions: [
           Consumer(
             builder: (context, ref, _) => IconButton(
-              icon: const Icon(Icons.logout_outlined),
-              tooltip: 'Se déconnecter',
-              onPressed: () =>
-                  ref.read(authControllerProvider.notifier).signOut(),
+              icon: const Icon(Icons.account_circle_outlined),
+              tooltip: 'Mon compte',
+              onPressed: () => context.go('/account'),
             ),
           ),
         ],
