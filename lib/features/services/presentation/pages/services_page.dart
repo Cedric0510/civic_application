@@ -1,17 +1,17 @@
-import 'package:civic_app/features/polls/presentation/controllers/polls_controller.dart';
-import 'package:civic_app/features/polls/presentation/widgets/poll_card.dart';
+import 'package:civic_app/features/services/presentation/controllers/services_controller.dart';
+import 'package:civic_app/features/services/presentation/widgets/service_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class PollsPage extends ConsumerWidget {
-  const PollsPage({super.key});
+class ServicesPage extends ConsumerWidget {
+  const ServicesPage({super.key});
 
-  static const Color _headerColor = Color(0xFF43A047);
+  static const Color _headerColor = Color(0xFFFB8C00);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(pollsControllerProvider);
+    final state = ref.watch(servicesControllerProvider);
 
     return Scaffold(
       body: CustomScrollView(
@@ -27,7 +27,7 @@ class PollsPage extends ConsumerWidget {
             ),
             flexibleSpace: const FlexibleSpaceBar(
               title: Text(
-                'Sondages',
+                'Services',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -43,18 +43,34 @@ class PollsPage extends ConsumerWidget {
               child: Center(child: CircularProgressIndicator()),
             ),
             error: (error, stackTrace) => const SliverFillRemaining(
-              child: Center(child: Text('Impossible de charger les sondages.')),
+              child: Center(child: Text('Impossible de charger les services.')),
             ),
-            data: (polls) => polls.isEmpty
-                ? const SliverFillRemaining(
-                    child: Center(child: Text('Aucun sondage disponible.')),
+            data: (services) => services.isEmpty
+                ? SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.location_city_outlined,
+                            size: 64,
+                            color: Colors.grey.shade300,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Aucun service disponible.',
+                            style: TextStyle(color: Colors.grey.shade500),
+                          ),
+                        ],
+                      ),
+                    ),
                   )
                 : SliverPadding(
                     padding: const EdgeInsets.all(16),
                     sliver: SliverList.builder(
-                      itemCount: polls.length,
+                      itemCount: services.length,
                       itemBuilder: (context, index) =>
-                          PollCard(poll: polls[index]),
+                          ServiceCard(service: services[index]),
                     ),
                   ),
           ),

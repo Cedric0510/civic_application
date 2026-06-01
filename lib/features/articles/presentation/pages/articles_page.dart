@@ -7,25 +7,61 @@ import 'package:go_router/go_router.dart';
 class ArticlesPage extends ConsumerWidget {
   const ArticlesPage({super.key});
 
+  static const Color _headerColor = Color(0xFF1E88E5);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(articlesControllerProvider);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Actualités')),
-      body: state.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) =>
-            const Center(child: Text('Impossible de charger les articles.')),
-        data: (articles) => articles.isEmpty
-            ? const Center(child: Text('Aucun article disponible.'))
-            : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: articles.length,
-                itemBuilder: (context, index) => ArticleCard(
-                  article: articles[index],
-                  onTap: () => context.push('/articles/${articles[index].id}'),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 80,
+            pinned: true,
+            backgroundColor: _headerColor,
+            foregroundColor: Colors.white,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => context.go('/home'),
+            ),
+            flexibleSpace: const FlexibleSpaceBar(
+              title: Text(
+                'Actualités',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
                 ),
               ),
+              titlePadding: EdgeInsets.only(left: 56, bottom: 12),
+              background: ColoredBox(color: _headerColor),
+            ),
+          ),
+          state.when(
+            loading: () => const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (error, stackTrace) => const SliverFillRemaining(
+              child: Center(child: Text('Impossible de charger les articles.')),
+            ),
+            data: (articles) => articles.isEmpty
+                ? const SliverFillRemaining(
+                    child: Center(child: Text('Aucun article disponible.')),
+                  )
+                : SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList.builder(
+                      itemCount: articles.length,
+                      itemBuilder: (context, index) => ArticleCard(
+                        article: articles[index],
+                        onTap: () =>
+                            context.push('/articles/${articles[index].id}'),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
       ),
     );
   }
