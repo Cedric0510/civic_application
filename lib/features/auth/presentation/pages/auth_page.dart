@@ -41,14 +41,23 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   String _mapError(Object error) {
     final msg = error is AppException ? error.message : '';
-    if (msg.contains('Invalid login')) {
+    final normalizedMsg = msg.toLowerCase();
+    if (normalizedMsg.contains('invalid login')) {
       return 'Email ou mot de passe incorrect.';
     }
-    if (msg.contains('already registered')) {
+    if (normalizedMsg.contains('already registered')) {
       return 'Cette adresse e-mail est déjà utilisée.';
     }
-    if (msg.contains('weak') || msg.contains('password')) {
+    if (normalizedMsg.contains('weak password') ||
+        normalizedMsg.contains('password should be at least') ||
+        normalizedMsg.contains('minimum 8')) {
       return 'Mot de passe trop faible (minimum 8 caractères).';
+    }
+    if (normalizedMsg.contains('name_not_resolved') ||
+        normalizedMsg.contains('xmlhttprequest error') ||
+        normalizedMsg.contains('failed host lookup') ||
+        normalizedMsg.contains('network')) {
+      return 'Impossible de contacter le serveur. Vérifiez la configuration Supabase et votre connexion.';
     }
     return 'Une erreur est survenue. Veuillez réessayer.';
   }

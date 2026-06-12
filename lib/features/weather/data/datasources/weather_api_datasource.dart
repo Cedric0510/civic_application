@@ -12,7 +12,7 @@ class WeatherApiDatasource {
   final http.Client _client;
 
   Future<WeatherModel> getWeather(String cityName) async {
-    final apiKey = dotenv.get('OPENWEATHERMAP_API_KEY', fallback: '');
+    final apiKey = dotenv.get('OPENWEATHERMAP_API_KEY', fallback: '').trim();
     if (apiKey.isEmpty) {
       throw const NetworkException();
     }
