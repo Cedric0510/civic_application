@@ -1,3 +1,4 @@
+import 'package:civic_app/core/constants/app_constants.dart';
 import 'package:civic_app/features/articles/domain/entities/article.dart';
 import 'package:civic_app/features/articles/presentation/controllers/articles_controller.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _ArticlesCarouselState extends ConsumerState<ArticlesCarousel> {
       error: (error, stackTrace) => const SizedBox.shrink(),
       data: (articles) {
         if (articles.isEmpty) return const SizedBox.shrink();
-        final items = articles.take(3).toList();
+        final items = articles.take(AppConstants.homeArticlesCount).toList();
         return Column(
           children: [
             SizedBox(

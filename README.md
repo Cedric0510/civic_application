@@ -50,6 +50,7 @@ City-Co est une application Flutter destinée aux citoyens de communes français
 
 - Flutter SDK >= 3.10.4
 - Un projet Supabase actif
+- Une clé API OpenWeatherMap pour la météo
 - Dart SDK >= 3.10.4
 
 ### Étapes
@@ -71,7 +72,10 @@ Contenu du fichier `.env` à la racine :
 ```
 SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 SUPABASE_ANON_KEY=your_anon_key_here
+OPENWEATHERMAP_API_KEY=your_openweathermap_api_key_here
 ```
+
+Sans `OPENWEATHERMAP_API_KEY`, le widget météo ne peut pas charger les données.
 
 ```bash
 # 4. Lancer l'application
