@@ -74,171 +74,222 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
     final isLoading = ref.watch(authControllerProvider) is AsyncLoading;
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: Column(
-        children: [
-          _AuthHeader(colorScheme: colorScheme),
-          Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        _isSignUp ? 'Créer un compte' : 'Connexion',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const _AuthBrand(),
+                  const SizedBox(height: 24),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: colorScheme.outlineVariant),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.shadow.withValues(alpha: 0.06),
+                          blurRadius: 24,
+                          offset: const Offset(0, 12),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Adresse e-mail',
-                          prefixIcon: Icon(Icons.email_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        autocorrect: false,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'L\'adresse e-mail est requise.';
-                          }
-                          final emailRegex = RegExp(
-                            r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$',
-                          );
-                          if (!emailRegex.hasMatch(value.trim())) {
-                            return 'Entrez une adresse e-mail valide.';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          labelText: 'Mot de passe',
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          border: const OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                            ),
-                            onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
-                          ),
-                        ),
-                        obscureText: _obscurePassword,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Le mot de passe est requis.';
-                          }
-                          if (_isSignUp && value.length < 8) {
-                            return 'Le mot de passe doit contenir au moins 8 caractères.';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 28),
-                      FilledButton(
-                        onPressed: isLoading ? null : _submit,
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                _isSignUp ? 'Créer un compte' : 'Se connecter',
-                                style: const TextStyle(fontSize: 16),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(22),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              _isSignUp ? 'Créer un compte' : 'Connexion',
+                              style: textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
                               ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: isLoading
-                            ? null
-                            : () => setState(() => _isSignUp = !_isSignUp),
-                        child: Text(
-                          _isSignUp
-                              ? 'Déjà un compte ? Se connecter'
-                              : 'Pas encore de compte ? S\'inscrire',
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              _isSignUp
+                                  ? 'Créez votre accès citoyen sécurisé.'
+                                  : 'Accédez à vos services municipaux.',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 24),
+                            TextFormField(
+                              controller: _emailController,
+                              decoration: const InputDecoration(
+                                labelText: 'Adresse e-mail',
+                                prefixIcon: Icon(Icons.email_outlined),
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              autocorrect: false,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'L\'adresse e-mail est requise.';
+                                }
+                                final emailRegex = RegExp(
+                                  r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$',
+                                );
+                                if (!emailRegex.hasMatch(value.trim())) {
+                                  return 'Entrez une adresse e-mail valide.';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Mot de passe',
+                                prefixIcon: const Icon(Icons.lock_outline),
+                                border: const OutlineInputBorder(),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                  ),
+                                  onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  ),
+                                ),
+                              ),
+                              obscureText: _obscurePassword,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Le mot de passe est requis.';
+                                }
+                                if (_isSignUp && value.length < 8) {
+                                  return 'Le mot de passe doit contenir au moins 8 caractères.';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 28),
+                            FilledButton(
+                              onPressed: isLoading ? null : _submit,
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      _isSignUp
+                                          ? 'Créer un compte'
+                                          : 'Se connecter',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                            ),
+                            const SizedBox(height: 12),
+                            TextButton(
+                              onPressed: isLoading
+                                  ? null
+                                  : () =>
+                                        setState(() => _isSignUp = !_isSignUp),
+                              child: Text(
+                                _isSignUp
+                                    ? 'Déjà un compte ? Se connecter'
+                                    : 'Pas encore de compte ? S\'inscrire',
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              'Vos données sont utilisées uniquement pour '
+                              'l\'authentification et ne sont pas partagées '
+                              'avec des tiers, conformément au RGPD.',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.outline,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 32),
-                      Text(
-                        'Vos données sont utilisées uniquement pour l\'authentification '
-                        'et ne sont pas partagées avec des tiers, '
-                        'conformément au RGPD.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.outline,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _AuthHeader extends StatelessWidget {
-  const _AuthHeader({required this.colorScheme});
-
-  final ColorScheme colorScheme;
+class _AuthBrand extends StatelessWidget {
+  const _AuthBrand();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(32, 64, 32, 40),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [colorScheme.primary, colorScheme.primaryContainer],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset('assets/images/logo.png', width: 90, height: 90),
-          const SizedBox(width: 12),
-          Text(
-            'City-Co',
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onPrimary,
-              letterSpacing: 1.2,
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: colorScheme.outlineVariant),
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Votre commune, simplement',
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Actualités, démarches et services municipaux au même endroit.',
+          style: textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }
