@@ -9,13 +9,14 @@ class ArticleModel extends Article {
     super.imageUrl,
   });
 
+  // Champs en camelCase : reflète la réponse JSON de civic_api (Prisma).
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
     return ArticleModel(
       id: json['id'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
-      imageUrl: json['image_url'] as String?,
-      publishedAt: DateTime.parse(json['published_at'] as String),
+      imageUrl: json['imageUrl'] as String?,
+      publishedAt: DateTime.parse(json['publishedAt'] as String),
     );
   }
 
@@ -24,8 +25,8 @@ class ArticleModel extends Article {
       'id': id,
       'title': title,
       'content': content,
-      'image_url': imageUrl,
-      'published_at': publishedAt.toIso8601String(),
+      'imageUrl': imageUrl,
+      'publishedAt': publishedAt.toIso8601String(),
     };
   }
 }

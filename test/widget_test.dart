@@ -12,8 +12,8 @@ void main() {
         'id': 'article-1',
         'title': 'Conseil municipal',
         'content': 'Compte rendu complet',
-        'image_url': 'https://example.com/article.jpg',
-        'published_at': '2026-06-01T10:30:00.000Z',
+        'imageUrl': 'https://example.com/article.jpg',
+        'publishedAt': '2026-06-01T10:30:00.000Z',
       };
 
       final model = ArticleModel.fromJson(json);
@@ -38,8 +38,8 @@ void main() {
         'id': 'article-2',
         'title': 'Travaux',
         'content': 'Travaux en cours',
-        'image_url': null,
-        'published_at': '2026-06-02T08:00:00.000Z',
+        'imageUrl': null,
+        'publishedAt': '2026-06-02T08:00:00.000Z',
       });
     });
   });

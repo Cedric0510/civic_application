@@ -1,5 +1,5 @@
-import 'package:civic_app/core/providers/supabase_provider.dart';
-import 'package:civic_app/features/articles/data/datasources/article_supabase_datasource.dart';
+import 'package:civic_app/core/providers/http_client_provider.dart';
+import 'package:civic_app/features/articles/data/datasources/article_api_datasource.dart';
 import 'package:civic_app/features/articles/data/repositories/article_repository_impl.dart';
 import 'package:civic_app/features/articles/domain/entities/article.dart';
 import 'package:civic_app/features/articles/domain/repositories/article_repository.dart';
@@ -7,8 +7,8 @@ import 'package:civic_app/features/articles/domain/usecases/get_article_by_id_us
 import 'package:civic_app/features/articles/domain/usecases/get_articles_usecase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final articleDatasourceProvider = Provider<ArticleSupabaseDatasource>((ref) {
-  return ArticleSupabaseDatasource(ref.watch(supabaseClientProvider));
+final articleDatasourceProvider = Provider<ArticleApiDatasource>((ref) {
+  return ArticleApiDatasource(ref.watch(httpClientProvider));
 });
 
 final articleRepositoryProvider = Provider<ArticleRepository>((ref) {
