@@ -1,4 +1,3 @@
-import 'package:civic_app/core/providers/auth_provider.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_controller.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
 import 'package:civic_app/features/account/presentation/widgets/account_appointment_card.dart';
@@ -42,7 +41,6 @@ class _AccountPageState extends ConsumerState<AccountPage> {
       }
     });
 
-    final authUser = ref.watch(authStateProvider).valueOrNull;
     final profileAsync = ref.watch(userProfileProvider);
     final appointmentsAsync = ref.watch(userAppointmentsProvider);
     final controllerState = ref.watch(accountControllerProvider);
@@ -94,7 +92,11 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _UserInfoSection(email: authUser?.email),
+                    // TODO(auth-migration): l'email n'est plus dérivé de la
+                    // session Supabase (auth citoyenne migrée vers civic_api,
+                    // cf. docs/ROADMAP.md) ; à rebrancher sur /citizens/me
+                    // quand account sera migré à son tour.
+                    const _UserInfoSection(email: null),
                     const SizedBox(height: 24),
                     _CitySection(
                       controller: _cityController,

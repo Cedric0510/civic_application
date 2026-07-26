@@ -1,8 +1,8 @@
-import 'package:civic_app/core/providers/auth_provider.dart';
 import 'package:civic_app/features/account/presentation/pages/account_page.dart';
 import 'package:civic_app/features/appointments/presentation/pages/appointment_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
+import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
@@ -10,7 +10,6 @@ import 'package:civic_app/features/services/presentation/pages/services_page.dar
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class _RouterRefreshNotifier extends ChangeNotifier {
   void notify() => notifyListeners();
@@ -18,7 +17,7 @@ class _RouterRefreshNotifier extends ChangeNotifier {
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefreshNotifier();
-  ref.listen<AsyncValue<User?>>(
+  ref.listen<AsyncValue<bool>>(
     authStateProvider,
     (previous, next) => notifier.notify(),
   );
@@ -29,7 +28,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: notifier,
     redirect: (context, state) {
       final authValue = ref.read(authStateProvider);
-      final isAuthenticated = authValue.valueOrNull != null;
+      final isAuthenticated = authValue.valueOrNull == true;
       final isOnAuth = state.matchedLocation == '/auth';
       // Actualités et accueil sont un contenu public côté civic_api (cahier
       // des charges : un citoyen non connecté peut consulter les actualités)

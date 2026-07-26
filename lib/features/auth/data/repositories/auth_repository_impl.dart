@@ -1,10 +1,10 @@
-import 'package:civic_app/features/auth/data/datasources/auth_supabase_datasource.dart';
+import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl(this._datasource);
 
-  final AuthSupabaseDatasource _datasource;
+  final AuthApiDatasource _datasource;
 
   @override
   Future<void> signIn({required String email, required String password}) =>

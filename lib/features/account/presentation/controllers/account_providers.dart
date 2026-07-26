@@ -1,4 +1,3 @@
-import 'package:civic_app/core/providers/auth_provider.dart';
 import 'package:civic_app/core/providers/supabase_provider.dart';
 import 'package:civic_app/features/account/data/datasources/account_supabase_datasource.dart';
 import 'package:civic_app/features/account/data/repositories/account_repository_impl.dart';
@@ -44,8 +43,9 @@ final userProfileProvider = FutureProvider.autoDispose<UserProfile?>((ref) {
 final userAppointmentsProvider = FutureProvider.autoDispose<List<Appointment>>((
   ref,
 ) async {
-  final auth = ref.watch(authStateProvider);
-  final email = auth.valueOrNull?.email;
-  if (email == null) return [];
-  return ref.watch(getUserAppointmentsUseCaseProvider).call(email);
+  // TODO(auth-migration): rendez-vous pas encore migrés vers civic_api ;
+  // plus d'email de session Supabase disponible depuis que l'auth citoyenne
+  // est passée sur civic_api (cf. docs/ROADMAP.md). Section vide en attendant
+  // la migration du module Appointments.
+  return [];
 });

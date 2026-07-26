@@ -39,25 +39,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     }
   }
 
+  // civic_api renvoie déjà des messages exploitables en français (identifiants
+  // invalides, email déjà utilisé, serveur injoignable...) — plus besoin de
+  // deviner leur sens à partir de heuristiques sur les messages Supabase.
   String _mapError(Object error) {
-    final msg = error is AppException ? error.message : '';
-    final normalizedMsg = msg.toLowerCase();
-    if (normalizedMsg.contains('invalid login')) {
-      return 'Email ou mot de passe incorrect.';
-    }
-    if (normalizedMsg.contains('already registered')) {
-      return 'Cette adresse e-mail est déjà utilisée.';
-    }
-    if (normalizedMsg.contains('weak password') ||
-        normalizedMsg.contains('password should be at least') ||
-        normalizedMsg.contains('minimum 8')) {
-      return 'Mot de passe trop faible (minimum 8 caractères).';
-    }
-    if (normalizedMsg.contains('name_not_resolved') ||
-        normalizedMsg.contains('xmlhttprequest error') ||
-        normalizedMsg.contains('failed host lookup') ||
-        normalizedMsg.contains('network')) {
-      return 'Impossible de contacter le serveur. Vérifiez la configuration Supabase et votre connexion.';
+    if (error is AppException && error.message.trim().isNotEmpty) {
+      return error.message;
     }
     return 'Une erreur est survenue. Veuillez réessayer.';
   }
