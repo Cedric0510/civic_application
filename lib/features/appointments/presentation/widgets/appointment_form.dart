@@ -1,3 +1,4 @@
+import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
 import 'package:civic_app/features/appointments/presentation/controllers/appointment_controller.dart';
 import 'package:civic_app/features/appointments/presentation/widgets/service_dropdown.dart';
@@ -14,17 +15,13 @@ class AppointmentForm extends ConsumerStatefulWidget {
 
 class _AppointmentFormState extends ConsumerState<AppointmentForm> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
   final _dateController = TextEditingController();
   final _messageController = TextEditingController();
-  String? _selectedService;
+  String? _selectedServiceId;
   DateTime? _selectedDate;
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
     _dateController.dispose();
     _messageController.dispose();
     super.dispose();
@@ -52,9 +49,7 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
         .read(appointmentControllerProvider.notifier)
         .submit(
           Appointment(
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            service: _selectedService!,
+            serviceId: _selectedServiceId!,
             date: _selectedDate!,
             message: _messageController.text.trim().isEmpty
                 ? null
@@ -65,12 +60,10 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
 
   void _reset() {
     _formKey.currentState?.reset();
-    _nameController.clear();
-    _emailController.clear();
     _dateController.clear();
     _messageController.clear();
     setState(() {
-      _selectedService = null;
+      _selectedServiceId = null;
       _selectedDate = null;
     });
     ref.read(appointmentControllerProvider.notifier).reset();
@@ -83,11 +76,13 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
       next,
     ) {
       if (next is AsyncError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Une erreur est survenue. Veuillez réessayer.'),
-          ),
-        );
+        final error = next.error;
+        final message = error is AppException
+            ? error.message
+            : 'Une erreur est survenue. Veuillez réessayer.';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       } else if (next is AsyncData && previous is AsyncLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -105,39 +100,8 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TextFormField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Nom complet',
-              border: OutlineInputBorder(),
-            ),
-            textCapitalization: TextCapitalization.words,
-            validator: (value) => value == null || value.trim().isEmpty
-                ? 'Le nom complet est requis.'
-                : null,
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _emailController,
-            decoration: const InputDecoration(
-              labelText: 'Adresse e-mail',
-              border: OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'L\'adresse e-mail est requise.';
-              }
-              final emailRegex = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
-              if (!emailRegex.hasMatch(value.trim())) {
-                return 'Entrez une adresse e-mail valide.';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
           ServiceDropdown(
-            onChanged: (value) => setState(() => _selectedService = value),
+            onChanged: (value) => setState(() => _selectedServiceId = value),
           ),
           const SizedBox(height: 16),
           TextFormField(

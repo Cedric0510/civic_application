@@ -48,9 +48,7 @@ void main() {
     test('fromJson maps all fields', () {
       final json = {
         'id': 'appointment-1',
-        'name': 'Jean Dupont',
-        'email': 'jean@example.com',
-        'service': 'Urbanisme',
+        'serviceId': 'service-1',
         'date': '2026-06-15',
         'message': 'Besoin d un document',
       };
@@ -58,28 +56,19 @@ void main() {
       final model = AppointmentModel.fromJson(json);
 
       expect(model.id, 'appointment-1');
-      expect(model.name, 'Jean Dupont');
-      expect(model.email, 'jean@example.com');
-      expect(model.service, 'Urbanisme');
+      expect(model.serviceId, 'service-1');
       expect(model.date, DateTime.parse('2026-06-15'));
       expect(model.message, 'Besoin d un document');
     });
 
     test('toJson formats date and omits empty message', () {
       final model = AppointmentModel(
-        name: 'Jean Dupont',
-        email: 'jean@example.com',
-        service: 'Urbanisme',
+        serviceId: 'service-1',
         date: DateTime(2026, 6, 15),
         message: '',
       );
 
-      expect(model.toJson(), {
-        'name': 'Jean Dupont',
-        'email': 'jean@example.com',
-        'service': 'Urbanisme',
-        'date': '2026-06-15',
-      });
+      expect(model.toJson(), {'serviceId': 'service-1', 'date': '2026-06-15'});
     });
   });
 

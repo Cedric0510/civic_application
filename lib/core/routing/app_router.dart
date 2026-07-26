@@ -30,13 +30,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final authValue = ref.read(authStateProvider);
       final isAuthenticated = authValue.valueOrNull == true;
       final isOnAuth = state.matchedLocation == '/auth';
-      // Actualités et accueil sont un contenu public côté civic_api (cahier
-      // des charges : un citoyen non connecté peut consulter les actualités)
+      // Actualités, services et sondages sont un contenu public côté
+      // civic_api (cahier des charges : un citoyen non connecté peut les
+      // consulter, seul le vote/la prise de rendez-vous exige un compte)
       // — pas de redirection vers /auth pour ces routes.
       final isPublicRoute =
           isOnAuth ||
           state.matchedLocation == '/home' ||
-          state.matchedLocation.startsWith('/articles');
+          state.matchedLocation.startsWith('/articles') ||
+          state.matchedLocation == '/services' ||
+          state.matchedLocation == '/polls';
       if (!isAuthenticated && !isPublicRoute) return '/auth';
       if (isAuthenticated && isOnAuth) return '/home';
       return null;

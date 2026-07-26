@@ -11,9 +11,9 @@ class PollOptionModel extends PollOption {
   factory PollOptionModel.fromJson(Map<String, dynamic> json) {
     return PollOptionModel(
       id: json['id'] as String,
-      pollId: json['poll_id'] as String,
-      optionText: json['option_text'] as String,
-      voteCount: json['vote_count'] as int,
+      pollId: json['pollId'] as String,
+      optionText: json['optionText'] as String,
+      voteCount: json['voteCount'] as int,
     );
   }
 }

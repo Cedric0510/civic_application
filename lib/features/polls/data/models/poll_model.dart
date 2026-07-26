@@ -10,11 +10,11 @@ class PollModel extends Poll {
   });
 
   factory PollModel.fromJson(Map<String, dynamic> json) {
-    final optionsList = json['poll_options'] as List<dynamic>;
+    final optionsList = json['options'] as List<dynamic>;
     return PollModel(
       id: json['id'] as String,
       question: json['question'] as String,
-      isActive: json['is_active'] as bool,
+      isActive: json['isActive'] as bool,
       options: optionsList
           .map((o) => PollOptionModel.fromJson(o as Map<String, dynamic>))
           .toList(),

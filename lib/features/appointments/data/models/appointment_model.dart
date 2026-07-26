@@ -4,9 +4,7 @@ import 'package:intl/intl.dart';
 class AppointmentModel extends Appointment {
   const AppointmentModel({
     super.id,
-    required super.name,
-    required super.email,
-    required super.service,
+    required super.serviceId,
     required super.date,
     super.message,
   });
@@ -14,19 +12,17 @@ class AppointmentModel extends Appointment {
   factory AppointmentModel.fromJson(Map<String, dynamic> json) {
     return AppointmentModel(
       id: json['id'] as String?,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      service: json['service'] as String,
+      serviceId: json['serviceId'] as String,
       date: DateTime.parse(json['date'] as String),
       message: json['message'] as String?,
     );
   }
 
+  // Seuls les champs attendus par POST /appointments : citizenId/communeId
+  // sont dérivés du JWT côté civic_api.
   Map<String, dynamic> toJson() {
     return {
-      'name': name,
-      'email': email,
-      'service': service,
+      'serviceId': serviceId,
       'date': DateFormat('yyyy-MM-dd').format(date),
       if (message != null && message!.isNotEmpty) 'message': message,
     };

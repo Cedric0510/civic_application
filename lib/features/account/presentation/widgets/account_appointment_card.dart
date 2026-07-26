@@ -1,16 +1,26 @@
 import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
+import 'package:civic_app/features/services/presentation/controllers/services_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class AccountAppointmentCard extends StatelessWidget {
+class AccountAppointmentCard extends ConsumerWidget {
   const AccountAppointmentCard({super.key, required this.appointment});
 
   final Appointment appointment;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final dateStr = DateFormat('dd/MM/yyyy').format(appointment.date);
+    // serviceId est un identifiant technique : on résout le nom lisible via
+    // la liste des services déjà chargée par ailleurs (même commune).
+    final servicesAsync = ref.watch(servicesControllerProvider);
+    final serviceName = servicesAsync.valueOrNull
+        ?.where((service) => service.id == appointment.serviceId)
+        .firstOrNull
+        ?.name;
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: Padding(
@@ -36,7 +46,7 @@ class AccountAppointmentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    appointment.service,
+                    serviceName ?? 'Service',
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

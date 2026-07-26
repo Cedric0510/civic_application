@@ -16,13 +16,21 @@ class PollsController extends AsyncNotifier<List<Poll>> {
     required String pollId,
     required String optionId,
   }) async {
+    final previousVotes = ref.read(votedPollsProvider);
     ref
         .read(votedPollsProvider.notifier)
         .update((state) => {...state, pollId: optionId});
-    await ref.read(submitVoteUseCaseProvider)(
-      PollVote(pollId: pollId, optionId: optionId),
-    );
-    ref.invalidateSelf();
+    try {
+      await ref.read(submitVoteUseCaseProvider)(
+        PollVote(pollId: pollId, optionId: optionId),
+      );
+      ref.invalidateSelf();
+    } catch (_) {
+      // Le vote a échoué (pas connecté, déjà voté...) : on annule la mise à
+      // jour optimiste pour ne pas afficher un vote qui n'a pas eu lieu.
+      ref.read(votedPollsProvider.notifier).state = previousVotes;
+      rethrow;
+    }
   }
 }
 

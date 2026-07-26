@@ -1,23 +1,25 @@
 import 'package:civic_app/features/account/domain/usecases/delete_account_usecase.dart';
-import 'package:civic_app/features/account/domain/usecases/update_city_usecase.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
+import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AccountController extends StateNotifier<AsyncValue<void>> {
-  AccountController(this._updateCity, this._deleteAccount)
+  AccountController(this._ref, this._deleteAccount)
     : super(const AsyncData(null));
 
-  final UpdateCityUseCase _updateCity;
+  final Ref _ref;
   final DeleteAccountUseCase _deleteAccount;
-
-  Future<void> updateCity(String city) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _updateCity(city));
-  }
 
   Future<void> deleteAccount() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _deleteAccount());
+    state = await AsyncValue.guard(() async {
+      await _deleteAccount();
+      // Le compte n'existe plus : la session locale doit être effacée elle
+      // aussi (réutilise le SignOutUseCase de la feature auth, seule source
+      // de vérité pour "effacer le token").
+      await _ref.read(signOutUseCaseProvider)();
+      await _ref.read(authStateProvider.notifier).refresh();
+    });
   }
 }
 
@@ -25,8 +27,5 @@ final accountControllerProvider =
     StateNotifierProvider.autoDispose<AccountController, AsyncValue<void>>((
       ref,
     ) {
-      return AccountController(
-        ref.watch(updateCityUseCaseProvider),
-        ref.watch(deleteAccountUseCaseProvider),
-      );
+      return AccountController(ref, ref.watch(deleteAccountUseCaseProvider));
     });

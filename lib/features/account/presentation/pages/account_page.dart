@@ -7,27 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class AccountPage extends ConsumerStatefulWidget {
+class AccountPage extends ConsumerWidget {
   const AccountPage({super.key});
 
-  @override
-  ConsumerState<AccountPage> createState() => _AccountPageState();
-}
-
-class _AccountPageState extends ConsumerState<AccountPage> {
   static const Color _headerColor = Color(0xFF5E35B1);
 
-  final TextEditingController _cityController = TextEditingController();
-  bool _cityInitialized = false;
-
   @override
-  void dispose() {
-    _cityController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     ref.listen<AsyncValue<void>>(accountControllerProvider, (previous, next) {
@@ -45,15 +31,6 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     final appointmentsAsync = ref.watch(userAppointmentsProvider);
     final controllerState = ref.watch(accountControllerProvider);
     final isLoading = controllerState is AsyncLoading;
-
-    profileAsync.whenData((profile) {
-      if (!_cityInitialized && profile?.preferredCity != null) {
-        _cityController.text = profile!.preferredCity!;
-        _cityInitialized = true;
-      } else if (!_cityInitialized && profile != null) {
-        _cityInitialized = true;
-      }
-    });
 
     return Scaffold(
       body: RefreshIndicator(
@@ -92,22 +69,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TODO(auth-migration): l'email n'est plus dérivé de la
-                    // session Supabase (auth citoyenne migrée vers civic_api,
-                    // cf. docs/ROADMAP.md) ; à rebrancher sur /citizens/me
-                    // quand account sera migré à son tour.
-                    const _UserInfoSection(email: null),
-                    const SizedBox(height: 24),
-                    _CitySection(
-                      controller: _cityController,
-                      isLoading: isLoading,
-                      onSave: () {
-                        final city = _cityController.text.trim();
-                        if (city.isEmpty) return;
-                        ref
-                            .read(accountControllerProvider.notifier)
-                            .updateCity(city);
-                      },
+                    _UserInfoSection(
+                      email: profileAsync.valueOrNull?.email,
                     ),
                     const SizedBox(height: 24),
                     _AppointmentsSection(appointmentsAsync: appointmentsAsync),
@@ -119,7 +82,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                             .read(authControllerProvider.notifier)
                             .signOut();
                       },
-                      onDeleteAccount: () => _confirmDeleteAccount(context),
+                      onDeleteAccount: () => _confirmDeleteAccount(context, ref),
                     ),
                     const SizedBox(height: 32),
                   ],
@@ -132,7 +95,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     );
   }
 
-  Future<void> _confirmDeleteAccount(BuildContext context) async {
+  Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -155,7 +118,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
         ],
       ),
     );
-    if (confirmed == true && mounted) {
+    if (confirmed == true && context.mounted) {
       await ref.read(accountControllerProvider.notifier).deleteAccount();
     }
   }
@@ -201,73 +164,6 @@ class _UserInfoSection extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CitySection extends StatelessWidget {
-  const _CitySection({
-    required this.controller,
-    required this.isLoading,
-    required this.onSave,
-  });
-
-  final TextEditingController controller;
-  final bool isLoading;
-  final VoidCallback onSave;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Ma ville',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  labelText: 'Nom de votre commune',
-                  hintText: 'ex: Lyon',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.location_city_outlined),
-                ),
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => onSave(),
-              ),
-            ),
-            const SizedBox(width: 12),
-            FilledButton(
-              onPressed: isLoading ? null : onSave,
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF5E35B1),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 20,
-                ),
-              ),
-              child: isLoading
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Enregistrer'),
-            ),
-          ],
         ),
       ],
     );
