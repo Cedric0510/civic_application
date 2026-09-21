@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      # flutter_dotenv est déclaré comme asset (pubspec.yaml) : sa seule
+      # présence est requise pour que flutter test/analyze fonctionnent, son
+      # contenu n'a pas besoin d'être réel en CI.
+      - run: cp .env.example .env
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
