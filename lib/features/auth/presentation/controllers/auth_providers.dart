@@ -1,5 +1,5 @@
-import 'package:civic_app/core/auth/token_storage.dart';
-import 'package:civic_app/core/providers/http_client_provider.dart';
+import 'package:civic_app/core/providers/api_client_provider.dart';
+import 'package:civic_app/core/providers/token_storage_provider.dart';
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
 import 'package:civic_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
@@ -8,13 +8,9 @@ import 'package:civic_app/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final tokenStorageProvider = Provider<TokenStorage>((ref) {
-  return const TokenStorage();
-});
-
 final authDatasourceProvider = Provider<AuthApiDatasource>((ref) {
   return AuthApiDatasource(
-    ref.watch(httpClientProvider),
+    ref.watch(apiClientProvider),
     ref.watch(tokenStorageProvider),
   );
 });

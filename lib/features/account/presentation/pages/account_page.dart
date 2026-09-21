@@ -1,3 +1,4 @@
+import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_controller.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
 import 'package:civic_app/features/account/presentation/widgets/account_appointment_card.dart';
@@ -18,9 +19,13 @@ class AccountPage extends ConsumerWidget {
 
     ref.listen<AsyncValue<void>>(accountControllerProvider, (previous, next) {
       if (next is AsyncError) {
+        final error = next.error;
+        final message = error is AppException
+            ? error.message
+            : 'Une erreur est survenue. Veuillez réessayer.';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.error.toString()),
+            content: Text(message),
             backgroundColor: theme.colorScheme.error,
           ),
         );
