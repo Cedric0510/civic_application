@@ -29,6 +29,12 @@ class NavigationTilesGrid extends StatelessWidget {
       color: Color(0xFFFB8C00),
       path: '/services',
     ),
+    _TileData(
+      label: 'Commerçants',
+      icon: Icons.storefront_outlined,
+      color: Color(0xFF00897B),
+      path: '/commerces',
+    ),
   ];
 
   @override

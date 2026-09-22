@@ -4,6 +4,7 @@ import 'package:civic_app/features/articles/presentation/pages/article_detail_pa
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:civic_app/features/commerces/presentation/pages/commerces_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
 import 'package:civic_app/features/services/presentation/pages/services_page.dart';
@@ -55,6 +56,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/services',
         builder: (context, state) => const ServicesPage(),
+      ),
+      GoRoute(
+        path: '/commerces',
+        builder: (context, state) => const CommercesPage(),
       ),
       GoRoute(
         path: '/account',
