@@ -7,6 +7,7 @@ class AppointmentModel extends Appointment {
     required super.serviceId,
     required super.date,
     super.message,
+    super.status,
   });
 
   factory AppointmentModel.fromJson(Map<String, dynamic> json) {
@@ -15,6 +16,9 @@ class AppointmentModel extends Appointment {
       serviceId: json['serviceId'] as String,
       date: DateTime.parse(json['date'] as String),
       message: json['message'] as String?,
+      status: json['status'] != null
+          ? AppointmentStatus.fromApiValue(json['status'] as String)
+          : null,
     );
   }
 

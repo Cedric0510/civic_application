@@ -75,6 +75,33 @@ class ArticleCard extends StatelessWidget {
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: colorScheme.outline),
                           ),
+                          if (article.category != null) ...[
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  article.category!,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ],

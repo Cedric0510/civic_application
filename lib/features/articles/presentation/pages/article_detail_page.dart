@@ -56,16 +56,34 @@ class ArticleDetailPage extends ConsumerWidget {
                           color: Colors.grey,
                         ),
                         const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            DateFormat(
-                              'dd/MM/yyyy',
-                            ).format(article.publishedAt),
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodySmall?.copyWith(color: Colors.grey),
-                          ),
+                        Text(
+                          DateFormat('dd/MM/yyyy').format(article.publishedAt),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                         ),
+                        if (article.category != null) ...[
+                          const SizedBox(width: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _headerColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              article.category!,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelSmall?.copyWith(
+                                color: _headerColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 20),

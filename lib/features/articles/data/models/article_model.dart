@@ -6,6 +6,7 @@ class ArticleModel extends Article {
     required super.title,
     required super.content,
     required super.publishedAt,
+    super.category,
     super.imageUrl,
   });
 
@@ -15,6 +16,7 @@ class ArticleModel extends Article {
       id: json['id'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
+      category: json['category'] as String?,
       imageUrl: json['imageUrl'] as String?,
       publishedAt: DateTime.parse(json['publishedAt'] as String),
     );
@@ -25,6 +27,7 @@ class ArticleModel extends Article {
       'id': id,
       'title': title,
       'content': content,
+      'category': category,
       'imageUrl': imageUrl,
       'publishedAt': publishedAt.toIso8601String(),
     };

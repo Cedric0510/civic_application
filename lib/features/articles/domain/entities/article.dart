@@ -6,15 +6,24 @@ class Article extends Equatable {
     required this.title,
     required this.content,
     required this.publishedAt,
+    this.category,
     this.imageUrl,
   });
 
   final String id;
   final String title;
   final String content;
+  final String? category;
   final String? imageUrl;
   final DateTime publishedAt;
 
   @override
-  List<Object?> get props => [id, title, content, imageUrl, publishedAt];
+  List<Object?> get props => [
+    id,
+    title,
+    content,
+    category,
+    imageUrl,
+    publishedAt,
+  ];
 }

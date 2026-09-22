@@ -5,17 +5,32 @@ import 'package:civic_app/features/polls/presentation/widgets/poll_option_tile.d
 import 'package:civic_app/features/polls/presentation/widgets/poll_result_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class PollCard extends ConsumerWidget {
   const PollCard({super.key, required this.poll});
 
   final Poll poll;
 
+  String? _scheduleMessage() {
+    final now = DateTime.now();
+    if (poll.opensAt != null && now.isBefore(poll.opensAt!)) {
+      return 'Ouvre le ${DateFormat('dd/MM/yyyy à HH:mm').format(poll.opensAt!)}';
+    }
+    if (poll.closesAt != null) {
+      return now.isAfter(poll.closesAt!)
+          ? 'Sondage clos'
+          : 'Clôture le ${DateFormat('dd/MM/yyyy à HH:mm').format(poll.closesAt!)}';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final votedPolls = ref.watch(votedPollsProvider);
     final hasVoted = votedPolls.containsKey(poll.id);
     final votedOptionId = votedPolls[poll.id];
+    final scheduleMessage = _scheduleMessage();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -30,6 +45,15 @@ class PollCard extends ConsumerWidget {
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
+            if (scheduleMessage != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                scheduleMessage,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+              ),
+            ],
             const SizedBox(height: 12),
             if (hasVoted) ...[
               ...poll.options.map(
@@ -47,6 +71,7 @@ class PollCard extends ConsumerWidget {
               ...poll.options.map(
                 (option) => PollOptionTile(
                   option: option,
+                  enabled: poll.isVotable,
                   onTap: () => ref
                       .read(pollsControllerProvider.notifier)
                       .submitVote(pollId: poll.id, optionId: option.id),

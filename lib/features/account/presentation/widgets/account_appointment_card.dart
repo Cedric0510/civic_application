@@ -9,6 +9,17 @@ class AccountAppointmentCard extends ConsumerWidget {
 
   final Appointment appointment;
 
+  Color _statusColor(AppointmentStatus status) {
+    switch (status) {
+      case AppointmentStatus.demande:
+        return Colors.grey.shade600;
+      case AppointmentStatus.confirme:
+        return Colors.green.shade600;
+      case AppointmentStatus.annule:
+        return Colors.red.shade600;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -45,11 +56,37 @@ class AccountAppointmentCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    serviceName ?? 'Service',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          serviceName ?? 'Service',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      if (appointment.status != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _statusColor(
+                              appointment.status!,
+                            ).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            appointment.status!.label,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: _statusColor(appointment.status!),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(dateStr, style: theme.textTheme.bodySmall),
