@@ -2,6 +2,8 @@ import 'package:civic_app/features/articles/data/models/article_model.dart';
 import 'package:civic_app/features/appointments/data/models/appointment_model.dart';
 import 'package:civic_app/features/polls/domain/entities/poll.dart';
 import 'package:civic_app/features/polls/domain/entities/poll_option.dart';
+import 'package:civic_app/features/reports/data/models/report_model.dart';
+import 'package:civic_app/features/reports/domain/entities/report.dart';
 import 'package:civic_app/features/weather/data/models/weather_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -70,6 +72,47 @@ void main() {
 
       expect(model.toJson(), {'serviceId': 'service-1', 'date': '2026-06-15'});
     });
+  });
+
+  group('ReportModel', () {
+    test('fromJson maps all fields, including category/status enums', () {
+      final json = {
+        'id': 'report-1',
+        'address': '12 rue de la Mairie',
+        'category': 'ECLAIRAGE',
+        'description': 'Ampoule grillée',
+        'imageUrl': 'https://example.com/report.jpg',
+        'status': 'EN_COURS',
+        'createdAt': '2026-06-01T10:30:00.000Z',
+      };
+
+      final model = ReportModel.fromJson(json);
+
+      expect(model.id, 'report-1');
+      expect(model.address, '12 rue de la Mairie');
+      expect(model.category, ReportCategory.eclairage);
+      expect(model.description, 'Ampoule grillée');
+      expect(model.imageUrl, 'https://example.com/report.jpg');
+      expect(model.status, ReportStatus.enCours);
+      expect(model.createdAt, DateTime.parse('2026-06-01T10:30:00.000Z'));
+    });
+
+    test(
+      'toJson sends only creation fields, omitting imageUrl when absent',
+      () {
+        final model = ReportModel(
+          address: '5 place de la Mairie',
+          category: ReportCategory.espacesVerts,
+          description: 'Herbe trop haute',
+        );
+
+        expect(model.toJson(), {
+          'address': '5 place de la Mairie',
+          'category': 'ESPACES_VERTS',
+          'description': 'Herbe trop haute',
+        });
+      },
+    );
   });
 
   group('Poll', () {

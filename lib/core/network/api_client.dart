@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/errors/app_exception.dart';
@@ -38,6 +39,22 @@ class ApiClient {
     return _send(
       () async => _client.delete(_uri(path), headers: await _headers()),
     );
+  }
+
+  // Réutilise le même endpoint /uploads que le dashboard (staff) -- ouvert
+  // à tout compte authentifié, cf. UploadsController côté civic_api. Seul
+  // point d'entrée multipart de l'appli, d'où le passage direct par
+  // http.MultipartRequest plutôt que par _headers()/jsonEncode.
+  Future<String> uploadImage(File file) async {
+    final json = await _send(() async {
+      final request = http.MultipartRequest('POST', _uri('/uploads'));
+      final token = await _tokenStorage.read();
+      if (token != null) request.headers['Authorization'] = 'Bearer $token';
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      final streamed = await _client.send(request);
+      return http.Response.fromStream(streamed);
+    });
+    return json['url'] as String;
   }
 
   Uri _uri(String path) => Uri.parse('$baseUrl$path');

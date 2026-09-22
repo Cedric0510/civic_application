@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Photo jointe à un signalement (feature Reports) -- prise directement
+         depuis l'appareil, cf. image_picker. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:label="City-Co"

@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Utilisée pour joindre une photo à un signalement.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Utilisée pour joindre une photo à un signalement depuis votre galerie.</string>
 </dict>
 </plist>
