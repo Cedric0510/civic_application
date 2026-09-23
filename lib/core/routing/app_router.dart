@@ -2,10 +2,11 @@ import 'package:civic_app/features/account/presentation/pages/account_page.dart'
 import 'package:civic_app/features/appointments/presentation/pages/appointment_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
-import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
+import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/commerces/presentation/pages/commerces_page.dart';
+import 'package:civic_app/features/commerces/presentation/pages/my_commerce_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
 import 'package:civic_app/features/reports/presentation/pages/reports_page.dart';
@@ -20,7 +21,7 @@ class _RouterRefreshNotifier extends ChangeNotifier {
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefreshNotifier();
-  ref.listen<AsyncValue<CommuneRef?>>(
+  ref.listen<AsyncValue<CitizenSession?>>(
     authStateProvider,
     (previous, next) => notifier.notify(),
   );
@@ -62,6 +63,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/commerces',
         builder: (context, state) => const CommercesPage(),
+      ),
+      GoRoute(
+        path: '/my-commerce',
+        builder: (context, state) => const MyCommercePage(),
       ),
       GoRoute(
         path: '/reports',

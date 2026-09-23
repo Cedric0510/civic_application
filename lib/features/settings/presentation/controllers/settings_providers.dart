@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final settingsDatasourceProvider = Provider<SettingsApiDatasource>((ref) {
   return SettingsApiDatasource(
     ref.watch(apiClientProvider),
-    ref.watch(authStateProvider).valueOrNull!.slug,
+    ref.watch(authStateProvider).valueOrNull!.commune.slug,
   );
 });
 

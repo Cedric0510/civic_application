@@ -28,4 +28,20 @@ class CommerceModel extends Commerce {
       notes: json['notes'] as String?,
     );
   }
+
+  // Champs modifiables via PATCH /commerces/:id -- le même DTO civic_api
+  // accepte staff et commerçant, cf. CommercesService.update.
+  Map<String, dynamic> toUpdateJson() {
+    return {
+      'name': name,
+      'category': category,
+      'description': description,
+      'email': email,
+      'phone': phone,
+      'address': address,
+      'hours': hours,
+      'imageUrl': imageUrl,
+      'notes': notes,
+    };
+  }
 }

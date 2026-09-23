@@ -1,6 +1,7 @@
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/core/network/api_client.dart';
+import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 
 class AuthApiDatasource {
@@ -32,12 +33,14 @@ class AuthApiDatasource {
 
   Future<void> signOut() => _tokenStorage.clear();
 
-  // Commune du citoyen si un token stocké existe et est encore accepté par
-  // civic_api, sinon null. En cas d'erreur réseau (pas de connexion), on ne
-  // déconnecte pas l'utilisateur pour un problème de connectivité ponctuel :
-  // on retombe sur la dernière commune connue (mise en cache à chaque succès)
-  // plutôt que de renvoyer null, qui le déconnecterait visuellement à tort.
-  Future<CommuneRef?> fetchSessionCommune() async {
+  // Session du citoyen (commune + rôle + commerce géré le cas échéant) si un
+  // token stocké existe et est encore accepté par civic_api, sinon null. En
+  // cas d'erreur réseau (pas de connexion), on ne déconnecte pas l'utilisateur
+  // pour un problème de connectivité ponctuel : on retombe sur la dernière
+  // commune connue (mise en cache à chaque succès), en USER par défaut --
+  // un commerçant perd temporairement l'accès à "Gérer mon commerce" le
+  // temps de retrouver la connexion, mais reste connecté.
+  Future<CitizenSession?> fetchSession() async {
     final token = await _tokenStorage.read();
     if (token == null) return null;
     try {
@@ -50,10 +53,22 @@ class AuthApiDatasource {
         'name': commune.name,
         'slug': commune.slug,
       });
-      return commune;
+      final managedCommerceJson = json['managedCommerce'] as Map<String, dynamic>?;
+      return CitizenSession(
+        commune: commune,
+        role: CitizenRole.fromApiValue(json['role'] as String),
+        managedCommerce: managedCommerceJson != null
+            ? ManagedCommerceRef.fromJson(managedCommerceJson)
+            : null,
+      );
     } on NetworkException {
       final cached = await _tokenStorage.readCommune();
-      if (cached != null) return CommuneRef.fromJson(cached);
+      if (cached != null) {
+        return CitizenSession(
+          commune: CommuneRef.fromJson(cached),
+          role: CitizenRole.user,
+        );
+      }
       rethrow;
     } catch (_) {
       await _tokenStorage.clear();

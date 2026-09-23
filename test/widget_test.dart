@@ -1,6 +1,7 @@
 import 'package:civic_app/features/articles/data/models/article_model.dart';
 import 'package:civic_app/features/appointments/data/models/appointment_model.dart';
 import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
+import 'package:civic_app/features/commerces/data/models/commerce_model.dart';
 import 'package:civic_app/features/polls/data/models/poll_model.dart';
 import 'package:civic_app/features/polls/domain/entities/poll.dart';
 import 'package:civic_app/features/polls/domain/entities/poll_option.dart';
@@ -132,6 +133,35 @@ void main() {
         });
       },
     );
+  });
+
+  group('CommerceModel', () {
+    test('toUpdateJson maps all editable fields', () {
+      final model = CommerceModel(
+        id: 'commerce-1',
+        name: 'Boulangerie du Centre',
+        category: 'Alimentation',
+        description: 'Pain frais et pâtisseries',
+        email: 'contact@boulangerie.fr',
+        phone: '0467123456',
+        address: '12 rue du Centre',
+        hours: 'Lun-Sam 7h-19h',
+        imageUrl: 'https://example.com/photo.jpg',
+        notes: 'Congés du 12 au 25 juillet',
+      );
+
+      expect(model.toUpdateJson(), {
+        'name': 'Boulangerie du Centre',
+        'category': 'Alimentation',
+        'description': 'Pain frais et pâtisseries',
+        'email': 'contact@boulangerie.fr',
+        'phone': '0467123456',
+        'address': '12 rue du Centre',
+        'hours': 'Lun-Sam 7h-19h',
+        'imageUrl': 'https://example.com/photo.jpg',
+        'notes': 'Congés du 12 au 25 juillet',
+      });
+    });
   });
 
   group('PollModel', () {

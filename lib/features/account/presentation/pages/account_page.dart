@@ -3,6 +3,7 @@ import 'package:civic_app/features/account/presentation/controllers/account_cont
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
 import 'package:civic_app/features/account/presentation/widgets/account_appointment_card.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,6 +37,7 @@ class AccountPage extends ConsumerWidget {
     final appointmentsAsync = ref.watch(userAppointmentsProvider);
     final controllerState = ref.watch(accountControllerProvider);
     final isLoading = controllerState is AsyncLoading;
+    final session = ref.watch(authStateProvider).valueOrNull;
 
     return Scaffold(
       body: RefreshIndicator(
@@ -79,6 +81,12 @@ class AccountPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 24),
                     _AppointmentsSection(appointmentsAsync: appointmentsAsync),
+                    if (session?.isCommercant ?? false) ...[
+                      const SizedBox(height: 24),
+                      _CommerceSection(
+                        commerceName: session!.managedCommerce!.name,
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     _DangerSection(
                       isLoading: isLoading,
@@ -240,6 +248,69 @@ class _AppointmentsSection extends ConsumerWidget {
                   .toList(),
             );
           },
+        ),
+      ],
+    );
+  }
+}
+
+class _CommerceSection extends StatelessWidget {
+  const _CommerceSection({required this.commerceName});
+
+  final String commerceName;
+
+  static const Color _accentColor = Color(0xFF00897B);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Mon commerce',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        InkWell(
+          onTap: () => context.go('/my-commerce'),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: _accentColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _accentColor.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.storefront_outlined, color: _accentColor),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        commerceName,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Gérer les horaires, photos et notes',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: _accentColor),
+              ],
+            ),
+          ),
         ),
       ],
     );

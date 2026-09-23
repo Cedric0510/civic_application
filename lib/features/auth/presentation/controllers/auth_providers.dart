@@ -2,6 +2,7 @@ import 'package:civic_app/core/providers/api_client_provider.dart';
 import 'package:civic_app/core/providers/token_storage_provider.dart';
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
 import 'package:civic_app/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_in_usecase.dart';
@@ -40,12 +41,12 @@ final publicCommunesProvider = FutureProvider<List<CommuneRef>>((ref) {
 
 // Identité de session (remplace l'ancien authStateProvider basé sur
 // Supabase.instance.client.auth.onAuthStateChange). Une valeur non-nulle
-// porte la commune du citoyen connecté -- c'est elle qui détermine le
-// contenu affiché dans le reste de l'appli (cf. docs/ROADMAP.md), plus une
-// commune figée en dur. Pas de flux temps réel équivalent côté civic_api :
-// on revalide le token stocké à la création, et AuthController demande un
+// porte la commune du citoyen connecté (détermine le contenu affiché dans
+// le reste de l'appli, cf. docs/ROADMAP.md) et son rôle éventuel de
+// commerçant. Pas de flux temps réel équivalent côté civic_api : on
+// revalide le token stocké à la création, et AuthController demande un
 // refresh explicite après signIn/signUp/signOut.
-class AuthStateNotifier extends StateNotifier<AsyncValue<CommuneRef?>> {
+class AuthStateNotifier extends StateNotifier<AsyncValue<CitizenSession?>> {
   AuthStateNotifier(this._datasource) : super(const AsyncLoading()) {
     refresh();
   }
@@ -54,11 +55,13 @@ class AuthStateNotifier extends StateNotifier<AsyncValue<CommuneRef?>> {
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _datasource.fetchSessionCommune());
+    state = await AsyncValue.guard(() => _datasource.fetchSession());
   }
 }
 
 final authStateProvider =
-    StateNotifierProvider<AuthStateNotifier, AsyncValue<CommuneRef?>>((ref) {
+    StateNotifierProvider<AuthStateNotifier, AsyncValue<CitizenSession?>>((
+      ref,
+    ) {
       return AuthStateNotifier(ref.watch(authDatasourceProvider));
     });
