@@ -7,7 +7,7 @@ import 'package:civic_app/features/polls/domain/entities/poll.dart';
 import 'package:civic_app/features/polls/domain/entities/poll_option.dart';
 import 'package:civic_app/features/reports/data/models/report_model.dart';
 import 'package:civic_app/features/reports/domain/entities/report.dart';
-import 'package:civic_app/features/weather/data/models/weather_model.dart';
+import 'package:civic_app/features/settings/data/models/city_settings_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -232,25 +232,33 @@ void main() {
     });
   });
 
-  group('WeatherModel', () {
-    test('fromJson maps nested API payload', () {
+  group('CitySettingsModel', () {
+    test('fromJson maps the cached weather when present', () {
       final json = {
-        'name': 'Lyon',
-        'weather': [
-          {'description': 'ciel degage', 'icon': '01d'},
-        ],
-        'main': {'temp': 21.4, 'humidity': 55},
-        'wind': {'speed': 3.6},
+        'name': 'Bessan',
+        'weatherTemperature': 21.4,
+        'weatherDescription': 'ciel dégagé',
+        'weatherIconCode': '01d',
+        'weatherHumidity': 55,
+        'weatherWindSpeed': 3.6,
       };
 
-      final model = WeatherModel.fromJson(json);
+      final model = CitySettingsModel.fromJson(json);
 
-      expect(model.cityName, 'Lyon');
-      expect(model.temperature, 21.4);
-      expect(model.description, 'ciel degage');
-      expect(model.iconCode, '01d');
-      expect(model.humidity, 55);
-      expect(model.windSpeed, 3.6);
+      expect(model.villageName, 'Bessan');
+      expect(model.weather, isNotNull);
+      expect(model.weather!.cityName, 'Bessan');
+      expect(model.weather!.temperature, 21.4);
+      expect(model.weather!.description, 'ciel dégagé');
+      expect(model.weather!.iconCode, '01d');
+      expect(model.weather!.humidity, 55);
+      expect(model.weather!.windSpeed, 3.6);
+    });
+
+    test('fromJson leaves weather null when civic_api has not cached it yet', () {
+      final model = CitySettingsModel.fromJson({'name': 'Bessan'});
+
+      expect(model.weather, isNull);
     });
   });
 }
