@@ -1,5 +1,7 @@
 import 'package:civic_app/core/errors/app_exception.dart';
+import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:civic_app/features/auth/presentation/widgets/commune_picker_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +18,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   final _passwordController = TextEditingController();
   bool _isSignUp = false;
   bool _obscurePassword = true;
+  CommuneRef? _selectedCommune;
 
   @override
   void dispose() {
@@ -31,7 +34,11 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     if (_isSignUp) {
       await ref
           .read(authControllerProvider.notifier)
-          .signUp(email: email, password: password);
+          .signUp(
+            email: email,
+            password: password,
+            communeSlug: _selectedCommune!.slug,
+          );
     } else {
       await ref
           .read(authControllerProvider.notifier)
@@ -165,6 +172,14 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 return null;
                               },
                             ),
+                            if (_isSignUp) ...[
+                              const SizedBox(height: 16),
+                              CommunePickerField(
+                                value: _selectedCommune,
+                                onChanged: (commune) =>
+                                    setState(() => _selectedCommune = commune),
+                              ),
+                            ],
                             const SizedBox(height: 28),
                             FilledButton(
                               onPressed: isLoading ? null : _submit,

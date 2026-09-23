@@ -23,10 +23,14 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<void> signUp({required String email, required String password}) async {
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required String communeSlug,
+  }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => _signUp(email: email, password: password),
+      () => _signUp(email: email, password: password, communeSlug: communeSlug),
     );
     if (!state.hasError) {
       await _ref.read(authStateProvider.notifier).refresh();

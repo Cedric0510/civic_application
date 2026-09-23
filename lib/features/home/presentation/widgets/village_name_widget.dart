@@ -1,4 +1,3 @@
-import 'package:civic_app/core/constants/app_constants.dart';
 import 'package:civic_app/features/settings/presentation/controllers/settings_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,8 +13,10 @@ class VillageNameWidget extends ConsumerWidget {
     ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold);
     return state.when(
       loading: () => const SizedBox.shrink(),
-      error: (error, stackTrace) =>
-          Text(AppConstants.villageName, style: titleStyle),
+      // Pas de repli sur un nom de ville en dur : dans une appli
+      // multi-commune, ce serait potentiellement celui d'une autre commune
+      // que celle du citoyen connecté.
+      error: (error, stackTrace) => Text('Votre commune', style: titleStyle),
       data: (settings) => Text(settings.villageName, style: titleStyle),
     );
   }

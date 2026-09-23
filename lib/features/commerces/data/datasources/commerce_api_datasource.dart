@@ -1,18 +1,18 @@
-import 'package:civic_app/core/constants/app_constants.dart';
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/commerces/data/models/commerce_model.dart';
 
 // Commerçants : contenu public côté civic_api, comme les services.
 class CommerceApiDatasource {
-  const CommerceApiDatasource(this._api);
+  const CommerceApiDatasource(this._api, this._communeSlug);
 
   final ApiClient _api;
+  final String _communeSlug;
 
   Future<List<CommerceModel>> getCommerces() async {
     final json =
         await _api.get(
               '/commerces?communeSlug='
-              '${Uri.encodeQueryComponent(AppConstants.communeSlug)}',
+              '${Uri.encodeQueryComponent(_communeSlug)}',
             )
             as List<dynamic>;
     final commerces = json

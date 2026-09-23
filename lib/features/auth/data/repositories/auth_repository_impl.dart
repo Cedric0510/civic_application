@@ -11,8 +11,15 @@ class AuthRepositoryImpl implements AuthRepository {
       _datasource.signIn(email: email, password: password);
 
   @override
-  Future<void> signUp({required String email, required String password}) =>
-      _datasource.signUp(email: email, password: password);
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required String communeSlug,
+  }) => _datasource.signUp(
+    email: email,
+    password: password,
+    communeSlug: communeSlug,
+  );
 
   @override
   Future<void> signOut() => _datasource.signOut();

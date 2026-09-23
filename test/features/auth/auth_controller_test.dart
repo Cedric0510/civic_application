@@ -1,6 +1,7 @@
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
+import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
@@ -9,12 +10,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+const _testCommune = CommuneRef(
+  id: 'commune-1',
+  name: 'Saint-Martin-de-Belleville',
+  slug: 'saint-martin-de-belleville',
+);
+
 class _FakeAuthRepository implements AuthRepository {
   int signInCalls = 0;
   int signUpCalls = 0;
   int signOutCalls = 0;
   String? lastEmail;
   String? lastPassword;
+  String? lastCommuneSlug;
 
   Object? signInError;
   Object? signUpError;
@@ -29,10 +37,15 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> signUp({required String email, required String password}) async {
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required String communeSlug,
+  }) async {
     signUpCalls++;
     lastEmail = email;
     lastPassword = password;
+    lastCommuneSlug = communeSlug;
     if (signUpError != null) throw signUpError!;
   }
 
@@ -43,10 +56,10 @@ class _FakeAuthRepository implements AuthRepository {
   }
 }
 
-// hasValidSession() is overridden below, so the ApiClient/TokenStorage
+// fetchSessionCommune() is overridden below, so the ApiClient/TokenStorage
 // passed to super() are never actually exercised -- placeholders only.
 class _FakeAuthDatasource extends AuthApiDatasource {
-  _FakeAuthDatasource(this.sessionValid)
+  _FakeAuthDatasource(this.sessionCommune)
     : super(
         ApiClient(
           MockClient((_) async => http.Response('{}', 200)),
@@ -55,13 +68,13 @@ class _FakeAuthDatasource extends AuthApiDatasource {
         TokenStorage(),
       );
 
-  bool sessionValid;
-  int hasValidSessionCalls = 0;
+  CommuneRef? sessionCommune;
+  int fetchSessionCommuneCalls = 0;
 
   @override
-  Future<bool> hasValidSession() async {
-    hasValidSessionCalls++;
-    return sessionValid;
+  Future<CommuneRef?> fetchSessionCommune() async {
+    fetchSessionCommuneCalls++;
+    return sessionCommune;
   }
 }
 
@@ -72,7 +85,7 @@ void main() {
 
   setUp(() {
     fakeRepo = _FakeAuthRepository();
-    fakeDatasource = _FakeAuthDatasource(false);
+    fakeDatasource = _FakeAuthDatasource(null);
     container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(fakeRepo),
@@ -85,13 +98,13 @@ void main() {
   });
 
   test(
-    'authStateProvider resolves to the datasource session validity',
+    'authStateProvider resolves to the commune returned by the datasource',
     () async {
-      fakeDatasource.sessionValid = true;
+      fakeDatasource.sessionCommune = _testCommune;
 
       await container.read(authStateProvider.notifier).refresh();
 
-      expect(container.read(authStateProvider).value, isTrue);
+      expect(container.read(authStateProvider).value, _testCommune);
     },
   );
 
@@ -110,39 +123,44 @@ void main() {
   );
 
   test('a successful signIn triggers an authStateProvider refresh', () async {
-    final callsBefore = fakeDatasource.hasValidSessionCalls;
+    final callsBefore = fakeDatasource.fetchSessionCommuneCalls;
 
     await container
         .read(authControllerProvider.notifier)
         .signIn(email: 'a@b.com', password: 'secret123');
 
-    expect(fakeDatasource.hasValidSessionCalls, greaterThan(callsBefore));
+    expect(fakeDatasource.fetchSessionCommuneCalls, greaterThan(callsBefore));
   });
 
   test(
     'a failed signIn surfaces the error and does not refresh session state',
     () async {
       fakeRepo.signInError = Exception('Identifiants invalides.');
-      final callsBefore = fakeDatasource.hasValidSessionCalls;
+      final callsBefore = fakeDatasource.fetchSessionCommuneCalls;
 
       await container
           .read(authControllerProvider.notifier)
           .signIn(email: 'a@b.com', password: 'wrong');
 
       expect(container.read(authControllerProvider).hasError, isTrue);
-      expect(fakeDatasource.hasValidSessionCalls, callsBefore);
+      expect(fakeDatasource.fetchSessionCommuneCalls, callsBefore);
     },
   );
 
   test(
-    'signUp forwards credentials and leaves state error-free on success',
+    'signUp forwards credentials and the chosen commune, leaves state error-free on success',
     () async {
       await container
           .read(authControllerProvider.notifier)
-          .signUp(email: 'new@b.com', password: 'secret123');
+          .signUp(
+            email: 'new@b.com',
+            password: 'secret123',
+            communeSlug: 'bessan',
+          );
 
       expect(fakeRepo.signUpCalls, 1);
       expect(fakeRepo.lastEmail, 'new@b.com');
+      expect(fakeRepo.lastCommuneSlug, 'bessan');
       expect(container.read(authControllerProvider).hasError, isFalse);
     },
   );
@@ -151,27 +169,31 @@ void main() {
     'a failed signUp surfaces the error and does not refresh session state',
     () async {
       fakeRepo.signUpError = Exception('Email déjà utilisé.');
-      final callsBefore = fakeDatasource.hasValidSessionCalls;
+      final callsBefore = fakeDatasource.fetchSessionCommuneCalls;
 
       await container
           .read(authControllerProvider.notifier)
-          .signUp(email: 'dup@b.com', password: 'secret123');
+          .signUp(
+            email: 'dup@b.com',
+            password: 'secret123',
+            communeSlug: 'bessan',
+          );
 
       expect(container.read(authControllerProvider).hasError, isTrue);
-      expect(fakeDatasource.hasValidSessionCalls, callsBefore);
+      expect(fakeDatasource.fetchSessionCommuneCalls, callsBefore);
     },
   );
 
   test(
     'signOut clears state and triggers an authStateProvider refresh on success',
     () async {
-      final callsBefore = fakeDatasource.hasValidSessionCalls;
+      final callsBefore = fakeDatasource.fetchSessionCommuneCalls;
 
       await container.read(authControllerProvider.notifier).signOut();
 
       expect(fakeRepo.signOutCalls, 1);
       expect(container.read(authControllerProvider).hasError, isFalse);
-      expect(fakeDatasource.hasValidSessionCalls, greaterThan(callsBefore));
+      expect(fakeDatasource.fetchSessionCommuneCalls, greaterThan(callsBefore));
     },
   );
 }

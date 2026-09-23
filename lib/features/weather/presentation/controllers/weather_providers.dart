@@ -1,4 +1,3 @@
-import 'package:civic_app/core/constants/app_constants.dart';
 import 'package:civic_app/core/providers/http_client_provider.dart';
 import 'package:civic_app/features/settings/presentation/controllers/settings_providers.dart';
 import 'package:civic_app/features/weather/data/datasources/weather_api_datasource.dart';
@@ -20,10 +19,11 @@ final getWeatherUseCaseProvider = Provider<GetWeatherUseCase>((ref) {
   return GetWeatherUseCase(ref.watch(weatherRepositoryProvider));
 });
 
-final weatherProvider = FutureProvider<Weather>((ref) {
-  final settingsAsync = ref.watch(citySettingsProvider);
-  final cityName =
-      settingsAsync.whenOrNull(data: (s) => s.villageName) ??
-      AppConstants.villageName;
-  return ref.read(getWeatherUseCaseProvider)(cityName);
+// Attend explicitement citySettingsProvider (commune du citoyen connecté,
+// résolue dynamiquement) plutôt que de retomber sur un nom de ville en dur :
+// dans une appli multi-commune, un mauvais repli afficherait la météo d'une
+// autre ville que la sienne.
+final weatherProvider = FutureProvider<Weather>((ref) async {
+  final settings = await ref.watch(citySettingsProvider.future);
+  return ref.read(getWeatherUseCaseProvider)(settings.villageName);
 });

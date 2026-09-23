@@ -1,4 +1,5 @@
 import 'package:civic_app/core/providers/api_client_provider.dart';
+import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/polls/data/datasources/poll_api_datasource.dart';
 import 'package:civic_app/features/polls/data/repositories/poll_repository_impl.dart';
 import 'package:civic_app/features/polls/domain/repositories/poll_repository.dart';
@@ -8,7 +9,10 @@ import 'package:civic_app/features/polls/domain/usecases/submit_vote_usecase.dar
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final pollDatasourceProvider = Provider<PollApiDatasource>((ref) {
-  return PollApiDatasource(ref.watch(apiClientProvider));
+  return PollApiDatasource(
+    ref.watch(apiClientProvider),
+    ref.watch(authStateProvider).valueOrNull!.slug,
+  );
 });
 
 final pollRepositoryProvider = Provider<PollRepository>((ref) {

@@ -2,6 +2,7 @@ import 'package:civic_app/features/account/presentation/pages/account_page.dart'
 import 'package:civic_app/features/appointments/presentation/pages/appointment_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/articles_page.dart';
+import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/commerces/presentation/pages/commerces_page.dart';
@@ -19,7 +20,7 @@ class _RouterRefreshNotifier extends ChangeNotifier {
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefreshNotifier();
-  ref.listen<AsyncValue<bool>>(
+  ref.listen<AsyncValue<CommuneRef?>>(
     authStateProvider,
     (previous, next) => notifier.notify(),
   );
@@ -30,7 +31,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: notifier,
     redirect: (context, state) {
       final authValue = ref.read(authStateProvider);
-      final isAuthenticated = authValue.valueOrNull == true;
+      final isAuthenticated = authValue.valueOrNull != null;
       final isOnAuth = state.matchedLocation == '/auth';
       // Toute l'app exige un compte : /auth est la seule route publique.
       if (!isAuthenticated && !isOnAuth) return '/auth';
