@@ -3,14 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ReportPhotoPicker extends StatelessWidget {
-  const ReportPhotoPicker({
+// Sélection de photo (caméra ou galerie) avec aperçu. Affiche aussi une
+// photo déjà enregistrée (existingImageUrl) tant qu'aucune nouvelle n'a été
+// choisie, pour les formulaires d'édition d'une fiche existante.
+class PhotoField extends StatelessWidget {
+  const PhotoField({
     super.key,
     required this.photo,
     required this.onChanged,
+    this.existingImageUrl,
+    this.label = 'Photo (facultatif)',
   });
 
   final File? photo;
+  final String? existingImageUrl;
+  final String label;
   final ValueChanged<File?> onChanged;
 
   Future<void> _pick(BuildContext context) async {
@@ -44,40 +51,55 @@ class ReportPhotoPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPhoto = photo != null || existingImageUrl != null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Photo (facultatif)',
-          style: Theme.of(context).textTheme.labelLarge,
-        ),
+        Text(label, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
-        if (photo != null)
+        if (hasPhoto)
           Stack(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  photo!,
-                  height: 160,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: photo != null
+                    ? Image.file(
+                        photo!,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.network(
+                        existingImageUrl!,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 160,
+                          color: Colors.grey.shade200,
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),
+                      ),
               ),
-              Positioned(
-                top: 6,
-                right: 6,
-                child: CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Colors.black54,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 16,
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => onChanged(null),
+              if (photo != null)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: CircleAvatar(
+                    radius: 14,
+                    backgroundColor: Colors.black54,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: 16,
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => onChanged(null),
+                    ),
                   ),
                 ),
-              ),
             ],
           )
         else
@@ -107,7 +129,7 @@ class ReportPhotoPicker extends StatelessWidget {
               ),
             ),
           ),
-        if (photo != null)
+        if (hasPhoto)
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton(

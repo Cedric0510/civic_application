@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 
 // Référence légère à une commune (id/nom/slug), utilisée à deux endroits :
 // la commune du citoyen connecté (résout tout le contenu affiché dans
-// l'appli, cf. docs/ROADMAP.md) et la liste publique des communes
-// partenaires proposée au moment de l'inscription.
+// l'appli) et la liste publique des communes partenaires proposée au
+// moment de l'inscription.
 class CommuneRef extends Equatable {
   const CommuneRef({required this.id, required this.name, required this.slug});
 

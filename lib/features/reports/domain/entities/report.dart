@@ -38,10 +38,9 @@ enum ReportStatus {
   }
 }
 
-// Signalement citoyen, version simplifiée de la bêta (cf. docs/ROADMAP.md
-// Décision 6) : ni carte, ni priorité/affectation. `status`/`createdAt` sont
-// nuls avant l'envoi -- civic_api les détermine (status par défaut, horodatage
-// de réception).
+// Signalement citoyen, version simplifiée : ni carte, ni priorité/affectation.
+// `status`/`createdAt` sont nuls avant l'envoi -- civic_api les détermine
+// (status par défaut, horodatage de réception).
 class Report extends Equatable {
   const Report({
     this.id,

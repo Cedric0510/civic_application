@@ -50,8 +50,6 @@ class MyCommerceController extends StateNotifier<AsyncValue<void>> {
       _ref.invalidate(myCommerceProvider);
     });
   }
-
-  void reset() => state = const AsyncData(null);
 }
 
 final myCommerceControllerProvider =

@@ -35,9 +35,8 @@ class ManagedCommerceRef extends Equatable {
 }
 
 // Identité de session du citoyen connecté : sa commune (pilote tout le
-// contenu affiché, cf. docs/ROADMAP.md) et, s'il est commerçant, le
-// commerce qu'il gère en autonomie -- cf. Décision "Rôle commerçant"
-// (2026-09-23).
+// contenu affiché) et, s'il est commerçant, le commerce qu'il gère en
+// autonomie.
 class CitizenSession extends Equatable {
   const CitizenSession({
     required this.commune,

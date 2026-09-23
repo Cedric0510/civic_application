@@ -39,11 +39,9 @@ final publicCommunesProvider = FutureProvider<List<CommuneRef>>((ref) {
   return ref.read(authDatasourceProvider).fetchPublicCommunes();
 });
 
-// Identité de session (remplace l'ancien authStateProvider basé sur
-// Supabase.instance.client.auth.onAuthStateChange). Une valeur non-nulle
-// porte la commune du citoyen connecté (détermine le contenu affiché dans
-// le reste de l'appli, cf. docs/ROADMAP.md) et son rôle éventuel de
-// commerçant. Pas de flux temps réel équivalent côté civic_api : on
+// Identité de session : une valeur non-nulle porte la commune du citoyen
+// connecté (détermine le contenu affiché dans le reste de l'appli) et son
+// rôle éventuel de commerçant. Pas de flux temps réel côté civic_api : on
 // revalide le token stocké à la création, et AuthController demande un
 // refresh explicite après signIn/signUp/signOut.
 class AuthStateNotifier extends StateNotifier<AsyncValue<CitizenSession?>> {

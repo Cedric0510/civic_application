@@ -29,19 +29,22 @@ class CommerceModel extends Commerce {
     );
   }
 
-  // Champs modifiables via PATCH /commerces/:id -- le même DTO civic_api
-  // accepte staff et commerçant, cf. CommercesService.update.
+  // Champs modifiables via PATCH /commerces/:id -- même DTO côté civic_api
+  // pour le staff (admin_civic) et le commerçant. Un champ nul est omis
+  // plutôt qu'envoyé explicitement (mêmes règles que commerceFields() côté
+  // admin_civic) : un champ laissé vide dans le formulaire n'efface pas la
+  // valeur existante.
   Map<String, dynamic> toUpdateJson() {
     return {
       'name': name,
-      'category': category,
-      'description': description,
-      'email': email,
-      'phone': phone,
-      'address': address,
-      'hours': hours,
-      'imageUrl': imageUrl,
-      'notes': notes,
+      if (category != null) 'category': category,
+      if (description != null) 'description': description,
+      if (email != null) 'email': email,
+      if (phone != null) 'phone': phone,
+      if (address != null) 'address': address,
+      if (hours != null) 'hours': hours,
+      if (imageUrl != null) 'imageUrl': imageUrl,
+      if (notes != null) 'notes': notes,
     };
   }
 }

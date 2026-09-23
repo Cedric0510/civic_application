@@ -5,7 +5,7 @@ import 'package:civic_app/features/reports/domain/entities/report.dart';
 import 'package:civic_app/features/reports/presentation/controllers/my_reports_controller.dart';
 import 'package:civic_app/features/reports/presentation/controllers/report_controller.dart';
 import 'package:civic_app/features/reports/presentation/widgets/report_category_dropdown.dart';
-import 'package:civic_app/features/reports/presentation/widgets/report_photo_picker.dart';
+import 'package:civic_app/shared/widgets/photo_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -112,7 +112,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 : null,
           ),
           const SizedBox(height: 16),
-          ReportPhotoPicker(
+          PhotoField(
             photo: _photo,
             onChanged: (file) => setState(() => _photo = file),
           ),

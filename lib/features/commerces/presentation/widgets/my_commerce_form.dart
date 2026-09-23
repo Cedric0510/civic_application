@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/commerces/domain/entities/commerce.dart';
 import 'package:civic_app/features/commerces/presentation/controllers/my_commerce_controller.dart';
-import 'package:civic_app/features/commerces/presentation/widgets/commerce_photo_field.dart';
+import 'package:civic_app/shared/widgets/photo_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -200,9 +200,10 @@ class _MyCommerceFormState extends ConsumerState<MyCommerceForm> {
             ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 16),
-          CommercePhotoField(
+          PhotoField(
             photo: _photo,
             existingImageUrl: widget.commerce.imageUrl,
+            label: 'Photo',
             onChanged: (file) => setState(() => _photo = file),
           ),
           const SizedBox(height: 24),

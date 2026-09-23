@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // Sélecteur de commune à l'inscription : uniquement les communes déjà
 // partenaires de City-Co (endpoint public /communes/public). Une commune
 // absente de la liste n'est volontairement pas saisissable ici -- cf.
-// _showCommuneNotListedDialog et docs/ROADMAP.md.
+// _showCommuneNotListedDialog.
 class CommunePickerField extends ConsumerWidget {
   const CommunePickerField({
     super.key,

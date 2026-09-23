@@ -23,6 +23,6 @@ class Commerce {
   final String? imageUrl;
 
   // Annonce publique tenue à jour par le commerçant/la mairie (congés,
-  // promotion du moment...) -- cf. docs/ROADMAP.md Décision 6.
+  // promotion du moment...).
   final String? notes;
 }

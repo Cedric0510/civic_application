@@ -162,6 +162,15 @@ void main() {
         'notes': 'Congés du 12 au 25 juillet',
       });
     });
+
+    test('toUpdateJson omits null fields instead of clearing them', () {
+      final model = CommerceModel(
+        id: 'commerce-1',
+        name: 'Boulangerie du Centre',
+      );
+
+      expect(model.toUpdateJson(), {'name': 'Boulangerie du Centre'});
+    });
   });
 
   group('PollModel', () {
