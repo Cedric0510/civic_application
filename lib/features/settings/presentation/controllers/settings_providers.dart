@@ -23,5 +23,5 @@ final getCitySettingsUseCaseProvider = Provider<GetCitySettingsUseCase>((ref) {
 });
 
 final citySettingsProvider = FutureProvider<CitySettings>((ref) {
-  return ref.read(getCitySettingsUseCaseProvider)();
+  return ref.watch(getCitySettingsUseCaseProvider)();
 });

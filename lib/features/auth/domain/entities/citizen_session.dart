@@ -42,15 +42,23 @@ class CitizenSession extends Equatable {
     required this.commune,
     required this.role,
     this.managedCommerce,
+    this.voteEligibleAt,
   });
 
   final CommuneRef commune;
   final CitizenRole role;
   final ManagedCommerceRef? managedCommerce;
 
+  // Null tant que civic_api n'a pas pu être interrogé (repli hors ligne) :
+  // on ne bloque alors pas l'interface, le serveur reste l'arbitre du vote.
+  final DateTime? voteEligibleAt;
+
   bool get isCommercant =>
       role == CitizenRole.commercant && managedCommerce != null;
 
+  bool canVoteAt(DateTime now) =>
+      voteEligibleAt == null || !now.isBefore(voteEligibleAt!);
+
   @override
-  List<Object?> get props => [commune, role, managedCommerce];
+  List<Object?> get props => [commune, role, managedCommerce, voteEligibleAt];
 }

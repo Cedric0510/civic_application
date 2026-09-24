@@ -21,6 +21,16 @@ class AccountController extends StateNotifier<AsyncValue<void>> {
       await _ref.read(authStateProvider.notifier).refresh();
     });
   }
+
+  Future<void> changeCommune(String communeSlug) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final session = await _ref.read(changeCommuneUseCaseProvider)(
+        communeSlug,
+      );
+      _ref.read(authStateProvider.notifier).updateSession(session);
+    });
+  }
 }
 
 final accountControllerProvider =

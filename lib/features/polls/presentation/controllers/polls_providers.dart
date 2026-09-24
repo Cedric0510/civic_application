@@ -32,3 +32,11 @@ final getUserVotesUseCaseProvider = Provider<GetUserVotesUseCase>((ref) {
 });
 
 final votedPollsProvider = StateProvider<Map<String, String>>((ref) => {});
+
+// Date à partir de laquelle le citoyen pourra voter, tant qu'il est encore
+// dans le délai d'attente qui suit son arrivée dans la commune ; null sinon.
+final voteWaitingUntilProvider = Provider<DateTime?>((ref) {
+  final session = ref.watch(authStateProvider).valueOrNull;
+  if (session == null || session.canVoteAt(DateTime.now())) return null;
+  return session.voteEligibleAt;
+});

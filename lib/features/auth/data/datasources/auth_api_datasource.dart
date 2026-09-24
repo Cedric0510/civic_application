@@ -45,22 +45,7 @@ class AuthApiDatasource {
     if (token == null) return null;
     try {
       final json = await _api.get('/citizens/me') as Map<String, dynamic>;
-      final commune = CommuneRef.fromJson(
-        json['commune'] as Map<String, dynamic>,
-      );
-      await _tokenStorage.saveCommune({
-        'id': commune.id,
-        'name': commune.name,
-        'slug': commune.slug,
-      });
-      final managedCommerceJson = json['managedCommerce'] as Map<String, dynamic>?;
-      return CitizenSession(
-        commune: commune,
-        role: CitizenRole.fromApiValue(json['role'] as String),
-        managedCommerce: managedCommerceJson != null
-            ? ManagedCommerceRef.fromJson(managedCommerceJson)
-            : null,
-      );
+      return _sessionFromJson(json);
     } on NetworkException {
       final cached = await _tokenStorage.readCommune();
       if (cached != null) {
@@ -74,6 +59,37 @@ class AuthApiDatasource {
       await _tokenStorage.clear();
       return null;
     }
+  }
+
+  Future<CitizenSession> changeCommune(String communeSlug) async {
+    final json =
+        await _api.patch('/citizens/me/commune', {'communeSlug': communeSlug})
+            as Map<String, dynamic>;
+    return _sessionFromJson(json);
+  }
+
+  Future<CitizenSession> _sessionFromJson(Map<String, dynamic> json) async {
+    final commune = CommuneRef.fromJson(
+      json['commune'] as Map<String, dynamic>,
+    );
+    await _tokenStorage.saveCommune({
+      'id': commune.id,
+      'name': commune.name,
+      'slug': commune.slug,
+    });
+    final managedCommerceJson =
+        json['managedCommerce'] as Map<String, dynamic>?;
+    final voteEligibleAt = json['voteEligibleAt'] as String?;
+    return CitizenSession(
+      commune: commune,
+      role: CitizenRole.fromApiValue(json['role'] as String),
+      managedCommerce: managedCommerceJson != null
+          ? ManagedCommerceRef.fromJson(managedCommerceJson)
+          : null,
+      voteEligibleAt: voteEligibleAt != null
+          ? DateTime.parse(voteEligibleAt)
+          : null,
+    );
   }
 
   // Liste des communes partenaires -- alimente le sélecteur affiché à

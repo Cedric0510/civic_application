@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ArticlesController extends AsyncNotifier<List<Article>> {
   @override
   Future<List<Article>> build() {
-    return ref.read(getArticlesUseCaseProvider)();
+    return ref.watch(getArticlesUseCaseProvider)();
   }
 }
 

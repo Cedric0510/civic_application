@@ -31,6 +31,7 @@ class PollCard extends ConsumerWidget {
     final hasVoted = votedPolls.containsKey(poll.id);
     final votedOptionId = votedPolls[poll.id];
     final scheduleMessage = _scheduleMessage();
+    final isWaitingToVote = ref.watch(voteWaitingUntilProvider) != null;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -71,7 +72,7 @@ class PollCard extends ConsumerWidget {
               ...poll.options.map(
                 (option) => PollOptionTile(
                   option: option,
-                  enabled: poll.isVotable,
+                  enabled: poll.isVotable && !isWaitingToVote,
                   onTap: () => ref
                       .read(pollsControllerProvider.notifier)
                       .submitVote(pollId: poll.id, optionId: option.id),

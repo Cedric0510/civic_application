@@ -59,6 +59,10 @@ class _FakeAuthRepository implements AuthRepository {
     signOutCalls++;
     if (signOutError != null) throw signOutError!;
   }
+
+  @override
+  Future<CitizenSession> changeCommune(String communeSlug) async =>
+      _testSession;
 }
 
 // fetchSession() is overridden below, so the ApiClient/TokenStorage passed

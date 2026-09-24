@@ -5,6 +5,7 @@ import 'package:civic_app/features/auth/data/repositories/auth_repository_impl.d
 import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:civic_app/features/auth/domain/usecases/change_commune_usecase.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_up_usecase.dart';
@@ -33,6 +34,10 @@ final signOutUseCaseProvider = Provider<SignOutUseCase>((ref) {
   return SignOutUseCase(ref.watch(authRepositoryProvider));
 });
 
+final changeCommuneUseCaseProvider = Provider<ChangeCommuneUseCase>((ref) {
+  return ChangeCommuneUseCase(ref.watch(authRepositoryProvider));
+});
+
 // Communes partenaires de City-Co -- alimente le sélecteur affiché à
 // l'inscription (endpoint public, appelable avant toute authentification).
 final publicCommunesProvider = FutureProvider<List<CommuneRef>>((ref) {
@@ -54,6 +59,12 @@ class AuthStateNotifier extends StateNotifier<AsyncValue<CitizenSession?>> {
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => _datasource.fetchSession());
+  }
+
+  // Sans passage par AsyncLoading : un changement de commune ne doit pas
+  // renvoyer le citoyen vers /auth le temps d'un refresh.
+  void updateSession(CitizenSession session) {
+    state = AsyncData(session);
   }
 }
 

@@ -2,6 +2,8 @@ import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_controller.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
 import 'package:civic_app/features/account/presentation/widgets/account_appointment_card.dart';
+import 'package:civic_app/features/account/presentation/widgets/change_commune_dialog.dart';
+import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
@@ -76,9 +78,15 @@ class AccountPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _UserInfoSection(
-                      email: profileAsync.valueOrNull?.email,
-                    ),
+                    _UserInfoSection(email: profileAsync.valueOrNull?.email),
+                    if (session != null) ...[
+                      const SizedBox(height: 24),
+                      _CommuneSection(
+                        session: session,
+                        isLoading: isLoading,
+                        onChange: () => _changeCommune(context, ref, session),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     _AppointmentsSection(appointmentsAsync: appointmentsAsync),
                     if (session?.isCommercant ?? false) ...[
@@ -95,7 +103,8 @@ class AccountPage extends ConsumerWidget {
                             .read(authControllerProvider.notifier)
                             .signOut();
                       },
-                      onDeleteAccount: () => _confirmDeleteAccount(context, ref),
+                      onDeleteAccount: () =>
+                          _confirmDeleteAccount(context, ref),
                     ),
                     const SizedBox(height: 32),
                   ],
@@ -108,7 +117,35 @@ class AccountPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+  Future<void> _changeCommune(
+    BuildContext context,
+    WidgetRef ref,
+    CitizenSession session,
+  ) async {
+    final selected = await showChangeCommuneDialog(
+      context,
+      current: session.commune,
+    );
+    if (selected == null || !context.mounted) return;
+
+    await ref
+        .read(accountControllerProvider.notifier)
+        .changeCommune(selected.slug);
+
+    if (!context.mounted || ref.read(accountControllerProvider).hasError) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Vous êtes maintenant rattaché à ${selected.name}.'),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteAccount(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -178,6 +215,61 @@ class _UserInfoSection extends StatelessWidget {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _CommuneSection extends StatelessWidget {
+  const _CommuneSection({
+    required this.session,
+    required this.isLoading,
+    required this.onChange,
+  });
+
+  final CitizenSession session;
+  final bool isLoading;
+  final VoidCallback onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Ma commune',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const Icon(Icons.location_city_outlined),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                session.commune.name,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: isLoading || session.isCommercant ? null : onChange,
+              child: const Text('Changer'),
+            ),
+          ],
+        ),
+        if (session.isCommercant)
+          Text(
+            'Un commerçant ne peut pas changer de commune : contactez votre '
+            'mairie pour être détaché de votre commerce.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
       ],
     );
   }

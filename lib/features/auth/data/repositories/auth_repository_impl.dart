@@ -1,4 +1,5 @@
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
+import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -23,4 +24,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> signOut() => _datasource.signOut();
+
+  @override
+  Future<CitizenSession> changeCommune(String communeSlug) =>
+      _datasource.changeCommune(communeSlug);
 }
