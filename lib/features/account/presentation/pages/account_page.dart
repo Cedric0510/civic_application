@@ -6,6 +6,8 @@ import 'package:civic_app/features/account/presentation/widgets/change_commune_d
 import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
+import 'package:civic_app/features/settings/domain/entities/app_module.dart';
+import 'package:civic_app/features/settings/presentation/controllers/settings_providers.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +38,15 @@ class AccountPage extends ConsumerWidget {
     });
 
     final profileAsync = ref.watch(userProfileProvider);
-    final appointmentsAsync = ref.watch(userAppointmentsProvider);
+    final appointmentsEnabled = ref.watch(
+      moduleEnabledProvider(AppModule.appointments),
+    );
+    final commerceEnabled = ref.watch(
+      moduleEnabledProvider(AppModule.commerces),
+    );
+    final appointmentsAsync = appointmentsEnabled
+        ? ref.watch(userAppointmentsProvider)
+        : null;
     final controllerState = ref.watch(accountControllerProvider);
     final isLoading = controllerState is AsyncLoading;
     final session = ref.watch(authStateProvider).valueOrNull;
@@ -87,9 +97,14 @@ class AccountPage extends ConsumerWidget {
                         onChange: () => _changeCommune(context, ref, session),
                       ),
                     ],
-                    const SizedBox(height: 24),
-                    _AppointmentsSection(appointmentsAsync: appointmentsAsync),
-                    if (session?.isCommercant ?? false) ...[
+                    if (appointmentsAsync != null) ...[
+                      const SizedBox(height: 24),
+                      _AppointmentsSection(
+                        appointmentsAsync: appointmentsAsync,
+                      ),
+                    ],
+                    if (commerceEnabled &&
+                        (session?.isCommercant ?? false)) ...[
                       const SizedBox(height: 24),
                       _CommerceSection(
                         commerceName: session!.managedCommerce!.name,

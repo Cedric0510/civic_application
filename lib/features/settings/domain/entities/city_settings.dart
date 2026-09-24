@@ -1,8 +1,13 @@
+import 'package:civic_app/features/settings/domain/entities/app_module.dart';
 import 'package:civic_app/features/weather/domain/entities/weather.dart';
 import 'package:equatable/equatable.dart';
 
 class CitySettings extends Equatable {
-  const CitySettings({required this.villageName, this.weather});
+  const CitySettings({
+    required this.villageName,
+    this.weather,
+    this.disabledModules = const {},
+  });
 
   final String villageName;
 
@@ -10,6 +15,10 @@ class CitySettings extends Equatable {
   // commune (cron quotidien, cf. WeatherService côté serveur).
   final Weather? weather;
 
+  final Set<AppModule> disabledModules;
+
+  bool isEnabled(AppModule module) => !disabledModules.contains(module);
+
   @override
-  List<Object?> get props => [villageName, weather];
+  List<Object?> get props => [villageName, weather, disabledModules];
 }

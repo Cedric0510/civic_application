@@ -1,3 +1,4 @@
+import 'package:civic_app/core/routing/app_redirect.dart';
 import 'package:civic_app/features/account/presentation/pages/account_page.dart';
 import 'package:civic_app/features/appointments/presentation/pages/appointment_page.dart';
 import 'package:civic_app/features/articles/presentation/pages/article_detail_page.dart';
@@ -11,6 +12,8 @@ import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
 import 'package:civic_app/features/reports/presentation/pages/reports_page.dart';
 import 'package:civic_app/features/services/presentation/pages/services_page.dart';
+import 'package:civic_app/features/settings/domain/entities/app_module.dart';
+import 'package:civic_app/features/settings/presentation/controllers/settings_providers.dart';
 import 'package:civic_app/features/weather/presentation/pages/weather_detail_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,20 +29,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     authStateProvider,
     (previous, next) => notifier.notify(),
   );
+  ref.listen<Set<AppModule>>(
+    disabledModulesProvider,
+    (previous, next) => notifier.notify(),
+  );
   ref.onDispose(notifier.dispose);
 
   return GoRouter(
     initialLocation: '/home',
     refreshListenable: notifier,
-    redirect: (context, state) {
-      final authValue = ref.read(authStateProvider);
-      final isAuthenticated = authValue.valueOrNull != null;
-      final isOnAuth = state.matchedLocation == '/auth';
-      // Toute l'app exige un compte : /auth est la seule route publique.
-      if (!isAuthenticated && !isOnAuth) return '/auth';
-      if (isAuthenticated && isOnAuth) return '/home';
-      return null;
-    },
+    redirect: (context, state) => resolveRedirect(
+      isAuthenticated: ref.read(authStateProvider).valueOrNull != null,
+      location: state.matchedLocation,
+      disabledModules: ref.read(disabledModulesProvider),
+    ),
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => const AuthPage()),
       GoRoute(path: '/home', builder: (context, state) => const HomePage()),

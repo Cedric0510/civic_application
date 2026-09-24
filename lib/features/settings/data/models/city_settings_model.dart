@@ -1,9 +1,14 @@
+import 'package:civic_app/features/settings/domain/entities/app_module.dart';
 import 'package:civic_app/features/settings/domain/entities/city_settings.dart';
 import 'package:civic_app/features/weather/domain/entities/weather.dart';
 import 'package:civic_app/features/weather/domain/entities/weather_forecast_entry.dart';
 
 class CitySettingsModel extends CitySettings {
-  const CitySettingsModel({required super.villageName, super.weather});
+  const CitySettingsModel({
+    required super.villageName,
+    super.weather,
+    super.disabledModules,
+  });
 
   // Reflète GET /communes/:slug (civic_api) — 'name', pas 'village_name'.
   // La météo (et son prévisionnel, forecastEntries) est mise en cache côté
@@ -28,7 +33,20 @@ class CitySettingsModel extends CitySettings {
             updatedAt: _parseLocalDate(json['weatherUpdatedAt']),
             forecast: _parseForecast(json['forecastEntries']),
           );
-    return CitySettingsModel(villageName: villageName, weather: weather);
+    return CitySettingsModel(
+      villageName: villageName,
+      weather: weather,
+      disabledModules: _parseDisabledModules(json['disabledModules']),
+    );
+  }
+
+  static Set<AppModule> _parseDisabledModules(dynamic raw) {
+    if (raw is! List) return const {};
+    return raw
+        .whereType<String>()
+        .map(AppModule.fromApiName)
+        .whereType<AppModule>()
+        .toSet();
   }
 
   static DateTime? _parseLocalDate(dynamic raw) =>

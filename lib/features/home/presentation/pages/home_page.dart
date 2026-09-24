@@ -2,6 +2,8 @@ import 'package:civic_app/features/home/presentation/widgets/articles_carousel.d
 import 'package:civic_app/features/home/presentation/widgets/navigation_tiles_grid.dart';
 import 'package:civic_app/features/home/presentation/widgets/village_name_widget.dart';
 import 'package:civic_app/features/home/presentation/widgets/weather_section.dart';
+import 'package:civic_app/features/settings/domain/entities/app_module.dart';
+import 'package:civic_app/shared/widgets/module_gate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +31,10 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 12),
-            const ArticlesCarousel(),
+            const ModuleGate(
+              module: AppModule.articles,
+              child: ArticlesCarousel(),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
               child: Column(
@@ -39,7 +44,10 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 16),
                   const NavigationTilesGrid(),
                   const SizedBox(height: 16),
-                  const WeatherSection(),
+                  const ModuleGate(
+                    module: AppModule.weather,
+                    child: WeatherSection(),
+                  ),
                   const SizedBox(height: 24),
                 ],
               ),

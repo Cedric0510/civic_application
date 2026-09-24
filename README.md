@@ -44,6 +44,7 @@ presentation/  contrôleurs Riverpod, pages, widgets
 - `lib/shared/` : widgets et utilitaires communs à plusieurs features.
 - **Session** : `authStateProvider` porte la commune, le rôle et le délai avant vote du citoyen connecté ; tous les contenus en dépendent et se rechargent quand la commune change.
 - **Météo** : l'appli ne contacte jamais OpenWeatherMap, elle lit le cache renvoyé par `GET /communes/:slug`.
+- **Modules** : City-Co peut désactiver des modules pour une commune (`disabledModules` dans `GET /communes/:slug`). `disabledModulesProvider` alimente l'accueil (tuiles, actualités, météo), la page Compte et le routeur (`resolveRedirect` renvoie vers l'accueil une route de module désactivé) ; l'API reste l'arbitre et répond 403 sur ces routes. La liste se recharge quand l'appli revient au premier plan.
 - Le jeton est conservé dans `flutter_secure_storage`.
 
 ## Pile technique
