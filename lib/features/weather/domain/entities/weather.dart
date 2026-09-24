@@ -1,3 +1,4 @@
+import 'package:civic_app/features/weather/domain/entities/weather_forecast_entry.dart';
 import 'package:equatable/equatable.dart';
 
 class Weather extends Equatable {
@@ -8,6 +9,7 @@ class Weather extends Equatable {
     required this.iconCode,
     required this.humidity,
     required this.windSpeed,
+    this.forecast = const [],
   });
 
   final String cityName;
@@ -16,6 +18,7 @@ class Weather extends Equatable {
   final String iconCode;
   final int humidity;
   final double windSpeed;
+  final List<WeatherForecastEntry> forecast;
 
   @override
   List<Object?> get props => [
@@ -25,5 +28,6 @@ class Weather extends Equatable {
     iconCode,
     humidity,
     windSpeed,
+    forecast,
   ];
 }

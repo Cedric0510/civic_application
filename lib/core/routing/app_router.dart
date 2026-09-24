@@ -11,6 +11,7 @@ import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
 import 'package:civic_app/features/reports/presentation/pages/reports_page.dart';
 import 'package:civic_app/features/services/presentation/pages/services_page.dart';
+import 'package:civic_app/features/weather/presentation/pages/weather_detail_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -75,6 +76,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/account',
         builder: (context, state) => const AccountPage(),
+      ),
+      GoRoute(
+        path: '/weather',
+        builder: (context, state) => const WeatherDetailPage(),
       ),
     ],
   );

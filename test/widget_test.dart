@@ -253,6 +253,35 @@ void main() {
       expect(model.weather!.iconCode, '01d');
       expect(model.weather!.humidity, 55);
       expect(model.weather!.windSpeed, 3.6);
+      expect(model.weather!.forecast, isEmpty);
+    });
+
+    test('fromJson maps the cached forecast entries when present', () {
+      final json = {
+        'name': 'Bessan',
+        'weatherTemperature': 21.4,
+        'weatherDescription': 'ciel dégagé',
+        'weatherIconCode': '01d',
+        'weatherHumidity': 55,
+        'weatherWindSpeed': 3.6,
+        'forecastEntries': [
+          {
+            'forecastAt': '2026-09-24T12:00:00.000Z',
+            'temperature': 22.1,
+            'description': 'nuageux',
+            'iconCode': '04d',
+          },
+        ],
+      };
+
+      final model = CitySettingsModel.fromJson(json);
+
+      expect(model.weather!.forecast, hasLength(1));
+      final entry = model.weather!.forecast.single;
+      expect(entry.time, DateTime.parse('2026-09-24T12:00:00.000Z'));
+      expect(entry.temperature, 22.1);
+      expect(entry.description, 'nuageux');
+      expect(entry.iconCode, '04d');
     });
 
     test('fromJson leaves weather null when civic_api has not cached it yet', () {
