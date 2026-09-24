@@ -302,6 +302,10 @@ void main() {
         'weatherIconCode': '01d',
         'weatherHumidity': 55,
         'weatherWindSpeed': 3.6,
+        'weatherFeelsLike': 20.2,
+        'weatherSunrise': '2026-09-24T05:35:27.000Z',
+        'weatherSunset': '2026-09-24T17:41:22.000Z',
+        'weatherUpdatedAt': '2026-09-24T10:00:00.000Z',
       };
 
       final model = CitySettingsModel.fromJson(json);
@@ -310,12 +314,47 @@ void main() {
       expect(model.weather, isNotNull);
       expect(model.weather!.cityName, 'Bessan');
       expect(model.weather!.temperature, 21.4);
+      expect(model.weather!.feelsLike, 20.2);
       expect(model.weather!.description, 'ciel dégagé');
       expect(model.weather!.iconCode, '01d');
       expect(model.weather!.humidity, 55);
       expect(model.weather!.windSpeed, 3.6);
+      expect(
+        model.weather!.sunrise!.isAtSameMomentAs(
+          DateTime.utc(2026, 9, 24, 5, 35, 27),
+        ),
+        isTrue,
+      );
+      expect(model.weather!.sunrise!.isUtc, isFalse);
+      expect(
+        model.weather!.sunset!.isAtSameMomentAs(
+          DateTime.utc(2026, 9, 24, 17, 41, 22),
+        ),
+        isTrue,
+      );
+      expect(
+        model.weather!.updatedAt!.isAtSameMomentAs(
+          DateTime.utc(2026, 9, 24, 10),
+        ),
+        isTrue,
+      );
       expect(model.weather!.forecast, isEmpty);
     });
+
+    test(
+      'fromJson falls back to the temperature when feels-like or sun times are absent',
+      () {
+        final model = CitySettingsModel.fromJson({
+          'name': 'Bessan',
+          'weatherTemperature': 21.4,
+        });
+
+        expect(model.weather!.feelsLike, 21.4);
+        expect(model.weather!.sunrise, isNull);
+        expect(model.weather!.sunset, isNull);
+        expect(model.weather!.updatedAt, isNull);
+      },
+    );
 
     test('fromJson maps the cached forecast entries when present', () {
       final json = {
@@ -329,8 +368,12 @@ void main() {
           {
             'forecastAt': '2026-09-24T12:00:00.000Z',
             'temperature': 22.1,
+            'feelsLike': 21.3,
             'description': 'nuageux',
             'iconCode': '04d',
+            'humidity': 48,
+            'windSpeed': 2.5,
+            'precipitationProbability': 35,
           },
         ],
       };
@@ -339,10 +382,18 @@ void main() {
 
       expect(model.weather!.forecast, hasLength(1));
       final entry = model.weather!.forecast.single;
-      expect(entry.time, DateTime.parse('2026-09-24T12:00:00.000Z'));
+      expect(
+        entry.time.isAtSameMomentAs(DateTime.utc(2026, 9, 24, 12)),
+        isTrue,
+      );
+      expect(entry.time.isUtc, isFalse);
       expect(entry.temperature, 22.1);
+      expect(entry.feelsLike, 21.3);
       expect(entry.description, 'nuageux');
       expect(entry.iconCode, '04d');
+      expect(entry.humidity, 48);
+      expect(entry.windSpeed, 2.5);
+      expect(entry.precipitationProbability, 35);
     });
 
     test(

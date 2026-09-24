@@ -6,8 +6,8 @@ class CitySettingsModel extends CitySettings {
   const CitySettingsModel({required super.villageName, super.weather});
 
   // Reflète GET /communes/:slug (civic_api) — 'name', pas 'village_name'.
-  // La météo (et son prévisionnel du jour, forecastEntries) est mise en
-  // cache côté serveur : weatherTemperature absent = pas encore rafraîchie.
+  // La météo (et son prévisionnel, forecastEntries) est mise en cache côté
+  // serveur : weatherTemperature absent = pas encore rafraîchie.
   factory CitySettingsModel.fromJson(Map<String, dynamic> json) {
     final villageName = json['name'] as String;
     final temperature = json['weatherTemperature'] as num?;
@@ -16,14 +16,23 @@ class CitySettingsModel extends CitySettings {
         : Weather(
             cityName: villageName,
             temperature: temperature.toDouble(),
+            feelsLike:
+                (json['weatherFeelsLike'] as num?)?.toDouble() ??
+                temperature.toDouble(),
             description: json['weatherDescription'] as String? ?? '',
             iconCode: json['weatherIconCode'] as String? ?? '',
             humidity: json['weatherHumidity'] as int? ?? 0,
             windSpeed: (json['weatherWindSpeed'] as num?)?.toDouble() ?? 0,
+            sunrise: _parseLocalDate(json['weatherSunrise']),
+            sunset: _parseLocalDate(json['weatherSunset']),
+            updatedAt: _parseLocalDate(json['weatherUpdatedAt']),
             forecast: _parseForecast(json['forecastEntries']),
           );
     return CitySettingsModel(villageName: villageName, weather: weather);
   }
+
+  static DateTime? _parseLocalDate(dynamic raw) =>
+      raw is String ? DateTime.parse(raw).toLocal() : null;
 
   static List<WeatherForecastEntry> _parseForecast(dynamic raw) {
     if (raw is! List) return const [];
@@ -31,10 +40,14 @@ class CitySettingsModel extends CitySettings {
         .cast<Map<String, dynamic>>()
         .map(
           (entry) => WeatherForecastEntry(
-            time: DateTime.parse(entry['forecastAt'] as String),
+            time: DateTime.parse(entry['forecastAt'] as String).toLocal(),
             temperature: (entry['temperature'] as num).toDouble(),
+            feelsLike: (entry['feelsLike'] as num).toDouble(),
             description: entry['description'] as String,
             iconCode: entry['iconCode'] as String,
+            humidity: entry['humidity'] as int,
+            windSpeed: (entry['windSpeed'] as num).toDouble(),
+            precipitationProbability: entry['precipitationProbability'] as int,
           ),
         )
         .toList();

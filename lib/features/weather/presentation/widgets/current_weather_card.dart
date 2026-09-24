@@ -1,5 +1,8 @@
 import 'package:civic_app/features/weather/domain/entities/weather.dart';
+import 'package:civic_app/features/weather/domain/weather_units.dart';
+import 'package:civic_app/features/weather/presentation/utils/weather_formatters.dart';
 import 'package:civic_app/features/weather/presentation/widgets/weather_icon.dart';
+import 'package:civic_app/features/weather/presentation/widgets/weather_palette.dart';
 import 'package:flutter/material.dart';
 
 class CurrentWeatherCard extends StatelessWidget {
@@ -9,12 +12,10 @@ class CurrentWeatherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [colorScheme.primary, colorScheme.tertiary],
+          colors: WeatherPalette.skyFor(weather.iconCode),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -33,7 +34,7 @@ class CurrentWeatherCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${weather.temperature.round()}°',
+                  formatTemperature(weather.temperature),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 48,
@@ -43,7 +44,7 @@ class CurrentWeatherCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  weather.description,
+                  capitalize(weather.description),
                   style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
                 const SizedBox(height: 8),
@@ -56,7 +57,7 @@ class CurrentWeatherCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${weather.humidity}%',
+                      '${weather.humidity} %',
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -66,7 +67,7 @@ class CurrentWeatherCard extends StatelessWidget {
                     const Icon(Icons.air, color: Colors.white70, size: 14),
                     const SizedBox(width: 4),
                     Text(
-                      '${weather.windSpeed.toStringAsFixed(1)} m/s',
+                      '${metersPerSecondToKmh(weather.windSpeed)} km/h',
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
