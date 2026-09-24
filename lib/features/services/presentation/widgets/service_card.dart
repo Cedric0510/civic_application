@@ -1,4 +1,6 @@
 import 'package:civic_app/features/services/domain/entities/service.dart';
+import 'package:civic_app/shared/utils/contact_launcher.dart';
+import 'package:civic_app/shared/widgets/info_row.dart';
 import 'package:flutter/material.dart';
 
 class ServiceCard extends StatelessWidget {
@@ -90,45 +92,29 @@ class ServiceCard extends StatelessWidget {
                   const SizedBox(height: 10),
                 ],
                 if (service.phone != null)
-                  _InfoRow(icon: Icons.phone_outlined, text: service.phone!),
+                  InfoRow(
+                    icon: Icons.phone_outlined,
+                    text: service.phone!,
+                    onTap: () => launchPhoneCall(service.phone!),
+                  ),
                 if (service.email != null)
-                  _InfoRow(icon: Icons.email_outlined, text: service.email!),
+                  InfoRow(
+                    icon: Icons.email_outlined,
+                    text: service.email!,
+                    onTap: () => launchEmail(service.email!),
+                  ),
                 if (service.address != null)
-                  _InfoRow(
+                  InfoRow(
                     icon: Icons.location_on_outlined,
                     text: service.address!,
                   ),
                 if (service.hours != null)
-                  _InfoRow(
+                  InfoRow(
                     icon: Icons.access_time_outlined,
                     text: service.hours!,
                   ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 16, color: Colors.grey.shade500),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(text, style: Theme.of(context).textTheme.bodySmall),
           ),
         ],
       ),
