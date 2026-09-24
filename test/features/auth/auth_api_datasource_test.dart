@@ -174,6 +174,28 @@ void main() {
     );
 
     test(
+      'returns null and clears the token when the response cannot be read',
+      () async {
+        final storage = _InMemoryTokenStorage(token: 'tok');
+        final datasource = AuthApiDatasource(
+          ApiClient(
+            MockClient(
+              (request) async =>
+                  http.Response(jsonEncode({'role': 'USER'}), 200),
+            ),
+            storage,
+          ),
+          storage,
+        );
+
+        final session = await datasource.fetchSession();
+
+        expect(session, isNull);
+        expect(await storage.read(), isNull);
+      },
+    );
+
+    test(
       'returns null and clears the stored token on a genuine auth rejection',
       () async {
         final storage = _InMemoryTokenStorage(token: 'stale-token');

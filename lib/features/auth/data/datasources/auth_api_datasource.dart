@@ -45,7 +45,7 @@ class AuthApiDatasource {
     if (token == null) return null;
     try {
       final json = await _api.get('/citizens/me') as Map<String, dynamic>;
-      return _sessionFromJson(json);
+      return await _sessionFromJson(json);
     } on NetworkException {
       final cached = await _tokenStorage.readCommune();
       if (cached != null) {
