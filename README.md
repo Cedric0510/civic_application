@@ -4,7 +4,7 @@ Application Flutter des citoyens d'une commune française. Elle se connecte à `
 
 ## Fonctionnalités
 
-- **Compte** : inscription en choisissant sa commune, connexion, changement de commune, suppression du compte. Une commune non partenaire est signalée à l'utilisateur.
+- **Compte** : inscription en choisissant sa commune, connexion, changement de commune, suppression du compte. Une commune non partenaire est signalée à l'utilisateur. Un futur commerçant invité par sa mairie touche « J'ai un code d'invitation commerçant » à l'inscription et saisit le code reçu par e-mail : son compte gère alors directement son commerce.
 - **Accueil** : actualités récentes et météo du jour ; toucher la carte météo ouvre le prévisionnel heure par heure.
 - **Actualités**, **Services** (téléphone et e-mail cliquables), **Commerçants** (idem).
 - **Sondages** : un vote par sondage, possible une semaine après l'arrivée dans une commune.

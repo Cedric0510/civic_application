@@ -16,7 +16,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _invitationCodeController = TextEditingController();
   bool _isSignUp = false;
+  bool _hasInvitationCode = false;
   bool _obscurePassword = true;
   CommuneRef? _selectedCommune;
 
@@ -24,6 +26,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _invitationCodeController.dispose();
     super.dispose();
   }
 
@@ -38,6 +41,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
             email: email,
             password: password,
             communeSlug: _selectedCommune!.slug,
+            invitationCode: _hasInvitationCode
+                ? _invitationCodeController.text
+                : null,
           );
     } else {
       await ref
@@ -176,6 +182,47 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 value: _selectedCommune,
                                 onChanged: (commune) =>
                                     setState(() => _selectedCommune = commune),
+                              ),
+                              const SizedBox(height: 4),
+                              if (_hasInvitationCode) ...[
+                                const SizedBox(height: 12),
+                                TextFormField(
+                                  controller: _invitationCodeController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Code d\'invitation',
+                                    helperText:
+                                        'Reçu par e-mail de votre mairie pour gérer un commerce.',
+                                    helperMaxLines: 2,
+                                    prefixIcon: Icon(Icons.storefront_outlined),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  textCapitalization:
+                                      TextCapitalization.characters,
+                                  autocorrect: false,
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'Saisissez le code reçu par e-mail.';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: TextButton(
+                                  onPressed: isLoading
+                                      ? null
+                                      : () => setState(() {
+                                          _hasInvitationCode =
+                                              !_hasInvitationCode;
+                                          _invitationCodeController.clear();
+                                        }),
+                                  child: Text(
+                                    _hasInvitationCode
+                                        ? 'Je n\'ai pas de code d\'invitation'
+                                        : 'J\'ai un code d\'invitation commerçant',
+                                  ),
+                                ),
                               ),
                             ],
                             const SizedBox(height: 28),

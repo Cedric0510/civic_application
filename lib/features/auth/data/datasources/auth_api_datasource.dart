@@ -22,11 +22,14 @@ class AuthApiDatasource {
     required String email,
     required String password,
     required String communeSlug,
+    String? invitationCode,
   }) async {
+    final code = invitationCode?.trim();
     final token = await _authenticate('/citizens/signup', {
       'email': email,
       'password': password,
       'communeSlug': communeSlug,
+      if (code != null && code.isNotEmpty) 'invitationCode': code,
     });
     await _tokenStorage.save(token);
   }

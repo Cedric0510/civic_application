@@ -6,6 +6,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String communeSlug,
+    String? invitationCode,
   });
   Future<void> signOut();
   Future<CitizenSession> changeCommune(String communeSlug);

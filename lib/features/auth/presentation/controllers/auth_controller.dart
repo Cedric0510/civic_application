@@ -27,10 +27,16 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     required String email,
     required String password,
     required String communeSlug,
+    String? invitationCode,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => _signUp(email: email, password: password, communeSlug: communeSlug),
+      () => _signUp(
+        email: email,
+        password: password,
+        communeSlug: communeSlug,
+        invitationCode: invitationCode,
+      ),
     );
     if (!state.hasError) {
       await _ref.read(authStateProvider.notifier).refresh();

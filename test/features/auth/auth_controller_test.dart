@@ -28,6 +28,7 @@ class _FakeAuthRepository implements AuthRepository {
   String? lastEmail;
   String? lastPassword;
   String? lastCommuneSlug;
+  String? lastInvitationCode;
 
   Object? signInError;
   Object? signUpError;
@@ -46,11 +47,13 @@ class _FakeAuthRepository implements AuthRepository {
     required String email,
     required String password,
     required String communeSlug,
+    String? invitationCode,
   }) async {
     signUpCalls++;
     lastEmail = email;
     lastPassword = password;
     lastCommuneSlug = communeSlug;
+    lastInvitationCode = invitationCode;
     if (signUpError != null) throw signUpError!;
   }
 
@@ -173,6 +176,31 @@ void main() {
       expect(container.read(authControllerProvider).hasError, isFalse);
     },
   );
+
+  test('signUp forwards the invitation code of a future commerçant', () async {
+    await container
+        .read(authControllerProvider.notifier)
+        .signUp(
+          email: 'martine@boulangerie.fr',
+          password: 'secret123',
+          communeSlug: 'bessan',
+          invitationCode: 'K7QM-2XPD',
+        );
+
+    expect(fakeRepo.lastInvitationCode, 'K7QM-2XPD');
+  });
+
+  test('signUp sends no invitation code by default', () async {
+    await container
+        .read(authControllerProvider.notifier)
+        .signUp(
+          email: 'new@b.com',
+          password: 'secret123',
+          communeSlug: 'bessan',
+        );
+
+    expect(fakeRepo.lastInvitationCode, isNull);
+  });
 
   test(
     'a failed signUp surfaces the error and does not refresh session state',

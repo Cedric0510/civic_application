@@ -218,6 +218,48 @@ void main() {
     );
   });
 
+  group('AuthApiDatasource.signUp', () {
+    Future<Map<String, dynamic>> bodySentBy({String? invitationCode}) async {
+      final storage = _InMemoryTokenStorage();
+      late Map<String, dynamic> sent;
+      final datasource = AuthApiDatasource(
+        ApiClient(
+          MockClient((request) async {
+            expect(request.url.path, '/citizens/signup');
+            sent = jsonDecode(request.body) as Map<String, dynamic>;
+            return http.Response(jsonEncode({'accessToken': 'tok'}), 201);
+          }),
+          storage,
+        ),
+        storage,
+      );
+
+      await datasource.signUp(
+        email: 'martine@boulangerie.fr',
+        password: 'secret123',
+        communeSlug: 'bessan',
+        invitationCode: invitationCode,
+      );
+      expect(await storage.read(), 'tok');
+      return sent;
+    }
+
+    test('sends the invitation code when there is one, trimmed', () async {
+      final body = await bodySentBy(invitationCode: '  K7QM-2XPD ');
+
+      expect(body['invitationCode'], 'K7QM-2XPD');
+      expect(body['communeSlug'], 'bessan');
+    });
+
+    test('leaves the field out when the code is missing or blank', () async {
+      expect(await bodySentBy(), isNot(contains('invitationCode')));
+      expect(
+        await bodySentBy(invitationCode: '   '),
+        isNot(contains('invitationCode')),
+      );
+    });
+  });
+
   group('AuthApiDatasource.changeCommune', () {
     test(
       'PATCHes the chosen slug, returns the new session and caches the new commune',
