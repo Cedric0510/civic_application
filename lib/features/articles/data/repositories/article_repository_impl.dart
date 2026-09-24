@@ -12,4 +12,7 @@ class ArticleRepositoryImpl implements ArticleRepository {
 
   @override
   Future<Article> getArticleById(String id) => _datasource.getArticleById(id);
+
+  @override
+  Future<void> recordView(String id) => _datasource.recordView(id);
 }

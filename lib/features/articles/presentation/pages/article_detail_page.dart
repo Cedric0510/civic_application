@@ -14,6 +14,7 @@ class ArticleDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(articleDetailProvider(articleId));
+    ref.watch(articleViewProvider(articleId));
 
     return Scaffold(
       body: state.when(

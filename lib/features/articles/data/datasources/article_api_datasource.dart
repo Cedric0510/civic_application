@@ -25,4 +25,8 @@ class ArticleApiDatasource {
     final json = await _api.get('/articles/$id') as Map<String, dynamic>;
     return ArticleModel.fromJson(json);
   }
+
+  Future<void> recordView(String id) async {
+    await _api.post('/articles/$id/view');
+  }
 }

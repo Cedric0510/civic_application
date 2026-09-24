@@ -5,6 +5,7 @@ import 'package:civic_app/features/articles/domain/entities/article.dart';
 import 'package:civic_app/features/articles/domain/repositories/article_repository.dart';
 import 'package:civic_app/features/articles/domain/usecases/get_article_by_id_usecase.dart';
 import 'package:civic_app/features/articles/domain/usecases/get_articles_usecase.dart';
+import 'package:civic_app/features/articles/domain/usecases/record_article_view_usecase.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,7 +28,21 @@ final getArticleByIdUseCaseProvider = Provider<GetArticleByIdUseCase>((ref) {
   return GetArticleByIdUseCase(ref.watch(articleRepositoryProvider));
 });
 
+final recordArticleViewUseCaseProvider = Provider<RecordArticleViewUseCase>((
+  ref,
+) {
+  return RecordArticleViewUseCase(ref.watch(articleRepositoryProvider));
+});
+
 final articleDetailProvider = FutureProvider.autoDispose
     .family<Article, String>((ref, id) {
       return ref.read(getArticleByIdUseCaseProvider)(id);
     });
+
+final articleViewProvider = FutureProvider.autoDispose.family<void, String>((
+  ref,
+  id,
+) async {
+  await ref.watch(articleDetailProvider(id).future);
+  await ref.read(recordArticleViewUseCaseProvider)(id);
+});
