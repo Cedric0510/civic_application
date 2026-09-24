@@ -9,3 +9,18 @@ final weatherProvider = FutureProvider<Weather?>((ref) async {
   final settings = await ref.watch(citySettingsProvider.future);
   return settings.weather;
 });
+
+final weatherClockProvider = StreamProvider.autoDispose<DateTime>((ref) async* {
+  yield DateTime.now();
+  yield* Stream.periodic(const Duration(minutes: 15), (_) => DateTime.now());
+});
+
+// La météo affichée suit l'heure : le serveur ne la rafraîchit que deux fois
+// par jour, on choisit donc dans son prévisionnel le créneau le plus proche.
+final currentWeatherProvider = Provider.autoDispose<AsyncValue<Weather?>>((
+  ref,
+) {
+  final now = ref.watch(weatherClockProvider).valueOrNull ?? DateTime.now();
+  final raw = ref.watch(weatherProvider);
+  return raw.hasValue ? AsyncData(raw.value?.atTime(now)) : raw;
+});

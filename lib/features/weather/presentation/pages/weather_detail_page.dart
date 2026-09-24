@@ -1,3 +1,4 @@
+import 'package:civic_app/features/settings/presentation/controllers/settings_providers.dart';
 import 'package:civic_app/features/weather/presentation/controllers/weather_providers.dart';
 import 'package:civic_app/features/weather/presentation/widgets/current_weather_card.dart';
 import 'package:civic_app/features/weather/presentation/widgets/forecast_timeline.dart';
@@ -11,7 +12,7 @@ class WeatherDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(weatherProvider);
+    final state = ref.watch(currentWeatherProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -45,7 +46,7 @@ class WeatherDetailPage extends ConsumerWidget {
             error: (error, stackTrace) => SliverFillRemaining(
               child: ErrorRetryWidget(
                 message: 'Impossible de charger la météo.',
-                onRetry: () => ref.invalidate(weatherProvider),
+                onRetry: () => ref.invalidate(citySettingsProvider),
               ),
             ),
             data: (weather) => weather == null

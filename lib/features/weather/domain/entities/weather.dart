@@ -20,6 +20,31 @@ class Weather extends Equatable {
   final double windSpeed;
   final List<WeatherForecastEntry> forecast;
 
+  static const maxForecastGap = Duration(minutes: 90);
+
+  Weather atTime(DateTime now) {
+    WeatherForecastEntry? nearest;
+    for (final entry in forecast) {
+      if (nearest == null || _gap(entry, now) < _gap(nearest, now)) {
+        nearest = entry;
+      }
+    }
+    if (nearest == null || _gap(nearest, now) > maxForecastGap) return this;
+
+    return Weather(
+      cityName: cityName,
+      temperature: nearest.temperature,
+      description: nearest.description,
+      iconCode: nearest.iconCode,
+      humidity: humidity,
+      windSpeed: windSpeed,
+      forecast: forecast,
+    );
+  }
+
+  static Duration _gap(WeatherForecastEntry entry, DateTime now) =>
+      entry.time.difference(now).abs();
+
   @override
   List<Object?> get props => [
     cityName,

@@ -9,7 +9,7 @@ class WeatherWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(weatherProvider);
+    final state = ref.watch(currentWeatherProvider);
 
     return state.when(
       loading: () => const _WeatherTileSkeleton(),

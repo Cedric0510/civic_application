@@ -1,5 +1,7 @@
+import 'package:civic_app/core/lifecycle/app_resume_observer.dart';
 import 'package:civic_app/core/routing/app_router.dart';
 import 'package:civic_app/core/theme/app_theme.dart';
+import 'package:civic_app/features/settings/presentation/controllers/settings_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,10 +18,13 @@ class CivicApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-    return MaterialApp.router(
-      title: 'City-Co',
-      theme: AppTheme.light,
-      routerConfig: router,
+    return AppResumeObserver(
+      onResume: () => ref.invalidate(citySettingsProvider),
+      child: MaterialApp.router(
+        title: 'City-Co',
+        theme: AppTheme.light,
+        routerConfig: router,
+      ),
     );
   }
 }
