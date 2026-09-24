@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// Le JWT civic_api doit survivre au redémarrage de l'app — contrairement à
-// Supabase, qui gérait ça de façon invisible via son propre SDK.
+// Le JWT civic_api doit survivre au redémarrage de l'app.
 class TokenStorage {
   const TokenStorage([FlutterSecureStorage? storage])
     : _storage = storage ?? const FlutterSecureStorage();
@@ -24,7 +23,7 @@ class TokenStorage {
   ]);
 
   // Dernière commune du citoyen résolue avec succès -- repli si une coupure
-  // réseau empêche de la re-résoudre (cf. AuthApiDatasource.fetchSessionCommune),
+  // réseau empêche de la re-résoudre (cf. AuthApiDatasource.fetchSession),
   // pour ne pas déconnecter visuellement quelqu'un dont le token reste valide.
   Future<void> saveCommune(Map<String, String> commune) =>
       _storage.write(key: _communeKey, value: jsonEncode(commune));

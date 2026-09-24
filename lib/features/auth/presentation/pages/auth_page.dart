@@ -46,9 +46,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     }
   }
 
-  // civic_api renvoie déjà des messages exploitables en français (identifiants
-  // invalides, email déjà utilisé, serveur injoignable...) — plus besoin de
-  // deviner leur sens à partir de heuristiques sur les messages Supabase.
+  // civic_api renvoie déjà des messages exploitables en français.
   String _mapError(Object error) {
     if (error is AppException && error.message.trim().isNotEmpty) {
       return error.message;

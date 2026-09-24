@@ -2,9 +2,6 @@ import 'package:civic_app/features/services/presentation/controllers/services_co
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Alimenté par les vrais services de la commune (civic_api) — un rendez-vous
-// se prend désormais pour un service réel (serviceId), plus un nom de
-// service tapé/choisi dans une liste figée.
 class ServiceDropdown extends ConsumerWidget {
   const ServiceDropdown({super.key, required this.onChanged});
 

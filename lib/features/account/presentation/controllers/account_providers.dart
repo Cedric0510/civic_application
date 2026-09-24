@@ -29,8 +29,6 @@ final userProfileProvider = FutureProvider.autoDispose<UserProfile?>((ref) {
   return ref.watch(getUserProfileUseCaseProvider).call();
 });
 
-// Passe désormais par la feature Appointments elle-même (GET
-// /appointments/mine) plutôt que par un chemin dédié dans Account.
 final userAppointmentsProvider = FutureProvider.autoDispose<List<Appointment>>(
   (ref) {
     return ref.watch(getMyAppointmentsUseCaseProvider).call();
