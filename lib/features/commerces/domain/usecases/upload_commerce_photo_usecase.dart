@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/features/commerces/domain/repositories/commerce_repository.dart';
 
@@ -7,5 +7,5 @@ class UploadCommercePhotoUseCase {
 
   final CommerceRepository _repository;
 
-  Future<String> call(File file) => _repository.uploadPhoto(file);
+  Future<String> call(XFile file) => _repository.uploadPhoto(file);
 }

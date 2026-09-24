@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/features/reports/data/datasources/report_api_datasource.dart';
 import 'package:civic_app/features/reports/data/models/report_model.dart';
@@ -26,5 +26,5 @@ class ReportRepositoryImpl implements ReportRepository {
   Future<List<Report>> getMyReports() => _datasource.getMyReports();
 
   @override
-  Future<String> uploadPhoto(File file) => _datasource.uploadPhoto(file);
+  Future<String> uploadPhoto(XFile file) => _datasource.uploadPhoto(file);
 }

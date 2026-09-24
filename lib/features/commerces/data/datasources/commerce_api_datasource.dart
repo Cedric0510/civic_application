@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/commerces/data/models/commerce_model.dart';
@@ -41,5 +41,5 @@ class CommerceApiDatasource {
     await _api.patch('/commerces/$id', commerce.toUpdateJson());
   }
 
-  Future<String> uploadPhoto(File file) => _api.uploadImage(file);
+  Future<String> uploadPhoto(XFile file) => _api.uploadImage(file);
 }

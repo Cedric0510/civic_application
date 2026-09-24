@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/commerces/domain/entities/commerce.dart';
@@ -27,7 +27,7 @@ class MyCommerceController extends StateNotifier<AsyncValue<void>> {
   final UpdateCommerceUseCase _updateUseCase;
   final UploadCommercePhotoUseCase _uploadUseCase;
 
-  Future<void> save(Commerce commerce, {File? photo}) async {
+  Future<void> save(Commerce commerce, {XFile? photo}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final imageUrl = photo != null

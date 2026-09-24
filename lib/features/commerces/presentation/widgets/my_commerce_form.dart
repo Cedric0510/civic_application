@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/commerces/domain/entities/commerce.dart';
@@ -40,7 +40,7 @@ class _MyCommerceFormState extends ConsumerState<MyCommerceForm> {
   late final _notesController = TextEditingController(
     text: widget.commerce.notes ?? '',
   );
-  File? _photo;
+  XFile? _photo;
 
   @override
   void dispose() {

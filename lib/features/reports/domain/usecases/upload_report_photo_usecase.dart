@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/features/reports/domain/repositories/report_repository.dart';
 
@@ -7,5 +7,5 @@ class UploadReportPhotoUseCase {
 
   final ReportRepository _repository;
 
-  Future<String> call(File file) => _repository.uploadPhoto(file);
+  Future<String> call(XFile file) => _repository.uploadPhoto(file);
 }

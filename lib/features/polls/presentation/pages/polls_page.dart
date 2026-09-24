@@ -104,9 +104,9 @@ class _VoteWaitingBanner extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Pour éviter les votes frauduleux, vous pourrez voter à partir du '
-              '${DateFormat('dd/MM/yyyy').format(until)} '
-              '(une semaine après votre arrivée dans la commune).',
+              "Afin d'assurer la sécurité des données, vous n'aurez accès à "
+              'cette partie qu\'à partir du '
+              '${DateFormat('dd/MM/yyyy').format(until)}.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSecondaryContainer,
               ),

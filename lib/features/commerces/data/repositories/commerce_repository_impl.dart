@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/features/commerces/data/datasources/commerce_api_datasource.dart';
 import 'package:civic_app/features/commerces/data/models/commerce_model.dart';
@@ -37,5 +37,5 @@ class CommerceRepositoryImpl implements CommerceRepository {
   }
 
   @override
-  Future<String> uploadPhoto(File file) => _datasource.uploadPhoto(file);
+  Future<String> uploadPhoto(XFile file) => _datasource.uploadPhoto(file);
 }

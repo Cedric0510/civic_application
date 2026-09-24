@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/errors/app_exception.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 // Client HTTP partagé pour tous les appels civic_api. Attache le JWT stocké
 // s'il existe — inoffensif pour les routes publiques (Articles, Services),
@@ -55,16 +56,33 @@ class ApiClient {
   // à tout compte authentifié, cf. UploadsController côté civic_api. Seul
   // point d'entrée multipart de l'appli, d'où le passage direct par
   // http.MultipartRequest plutôt que par _headers()/jsonEncode.
-  Future<String> uploadImage(File file) async {
+  Future<String> uploadImage(XFile file) async {
+    final bytes = await file.readAsBytes();
     final json = await _send(() async {
       final request = http.MultipartRequest('POST', _uri('/uploads'));
       final token = await _tokenStorage.read();
       if (token != null) request.headers['Authorization'] = 'Bearer $token';
-      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: file.name.isEmpty ? 'photo' : file.name,
+          contentType: MediaType.parse(_imageMimeType(file)),
+        ),
+      );
       final streamed = await _client.send(request);
       return http.Response.fromStream(streamed);
     });
     return json['url'] as String;
+  }
+
+  static String _imageMimeType(XFile file) {
+    final declared = file.mimeType;
+    if (declared != null && declared.startsWith('image/')) return declared;
+    final name = file.name.toLowerCase();
+    if (name.endsWith('.png')) return 'image/png';
+    if (name.endsWith('.webp')) return 'image/webp';
+    return 'image/jpeg';
   }
 
   Uri _uri(String path) => Uri.parse('$baseUrl$path');

@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/reports/domain/entities/report.dart';
@@ -21,7 +21,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   final _addressController = TextEditingController();
   final _descriptionController = TextEditingController();
   ReportCategory? _selectedCategory;
-  File? _photo;
+  XFile? _photo;
 
   @override
   void dispose() {

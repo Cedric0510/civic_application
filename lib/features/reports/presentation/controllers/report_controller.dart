@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/features/reports/domain/entities/report.dart';
 import 'package:civic_app/features/reports/domain/usecases/create_report_usecase.dart';
@@ -13,7 +13,7 @@ class ReportController extends StateNotifier<AsyncValue<void>> {
   final CreateReportUseCase _createUseCase;
   final UploadReportPhotoUseCase _uploadUseCase;
 
-  Future<void> submit(Report report, {File? photo}) async {
+  Future<void> submit(Report report, {XFile? photo}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final imageUrl = photo != null ? await _uploadUseCase(photo) : null;

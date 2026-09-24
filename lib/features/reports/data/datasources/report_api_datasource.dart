@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/reports/data/models/report_model.dart';
@@ -21,5 +21,5 @@ class ReportApiDatasource {
     return reports;
   }
 
-  Future<String> uploadPhoto(File file) => _api.uploadImage(file);
+  Future<String> uploadPhoto(XFile file) => _api.uploadImage(file);
 }

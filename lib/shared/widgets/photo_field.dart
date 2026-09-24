@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,10 +15,10 @@ class PhotoField extends StatelessWidget {
     this.label = 'Photo (facultatif)',
   });
 
-  final File? photo;
+  final XFile? photo;
   final String? existingImageUrl;
   final String label;
-  final ValueChanged<File?> onChanged;
+  final ValueChanged<XFile?> onChanged;
 
   Future<void> _pick(BuildContext context) async {
     final source = await showModalBottomSheet<ImageSource>(
@@ -46,7 +46,7 @@ class PhotoField extends StatelessWidget {
       maxWidth: 1600,
       imageQuality: 85,
     );
-    if (picked != null) onChanged(File(picked.path));
+    if (picked != null) onChanged(picked);
   }
 
   @override
@@ -64,25 +64,14 @@ class PhotoField extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: photo != null
-                    ? Image.file(
-                        photo!,
-                        height: 160,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      )
+                    ? _PickedPhotoPreview(photo: photo!)
                     : Image.network(
                         existingImageUrl!,
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          height: 160,
-                          color: Colors.grey.shade200,
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            color: Colors.grey.shade400,
-                          ),
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const _PhotoPlaceholder(),
                       ),
               ),
               if (photo != null)
@@ -116,10 +105,7 @@ class PhotoField extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.add_a_photo_outlined,
-                    color: Colors.grey.shade500,
-                  ),
+                  Icon(Icons.add_a_photo_outlined, color: Colors.grey.shade500),
                   const SizedBox(height: 4),
                   Text(
                     'Ajouter une photo',
@@ -138,6 +124,65 @@ class PhotoField extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _PickedPhotoPreview extends StatefulWidget {
+  const _PickedPhotoPreview({required this.photo});
+
+  final XFile photo;
+
+  @override
+  State<_PickedPhotoPreview> createState() => _PickedPhotoPreviewState();
+}
+
+class _PickedPhotoPreviewState extends State<_PickedPhotoPreview> {
+  late Future<Uint8List> _bytes = widget.photo.readAsBytes();
+
+  @override
+  void didUpdateWidget(_PickedPhotoPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.photo.path != widget.photo.path) {
+      _bytes = widget.photo.readAsBytes();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Uint8List>(
+      future: _bytes,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) return const _PhotoPlaceholder();
+        if (!snapshot.hasData) {
+          return const SizedBox(
+            height: 160,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return Image.memory(
+          snapshot.data!,
+          height: 160,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        );
+      },
+    );
+  }
+}
+
+class _PhotoPlaceholder extends StatelessWidget {
+  const _PhotoPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 160,
+      color: Colors.grey.shade200,
+      child: Icon(
+        Icons.image_not_supported_outlined,
+        color: Colors.grey.shade400,
+      ),
     );
   }
 }
