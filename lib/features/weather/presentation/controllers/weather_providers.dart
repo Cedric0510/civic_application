@@ -21,6 +21,5 @@ final currentWeatherProvider = Provider.autoDispose<AsyncValue<Weather?>>((
   ref,
 ) {
   final now = ref.watch(weatherClockProvider).valueOrNull ?? DateTime.now();
-  final raw = ref.watch(weatherProvider);
-  return raw.hasValue ? AsyncData(raw.value?.atTime(now)) : raw;
+  return ref.watch(weatherProvider).whenData((weather) => weather?.atTime(now));
 });
