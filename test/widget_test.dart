@@ -1,6 +1,8 @@
 import 'package:civic_app/features/articles/data/models/article_model.dart';
 import 'package:civic_app/features/appointments/data/models/appointment_model.dart';
+import 'package:civic_app/features/appointments/data/models/appointment_request_model.dart';
 import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
+import 'package:civic_app/features/appointments/domain/entities/appointment_slot.dart';
 import 'package:civic_app/features/commerces/data/models/commerce_model.dart';
 import 'package:civic_app/features/polls/data/models/poll_model.dart';
 import 'package:civic_app/features/polls/domain/entities/poll.dart';
@@ -54,11 +56,13 @@ void main() {
   });
 
   group('AppointmentModel', () {
-    test('fromJson maps all fields, including status', () {
+    test('fromJson maps all fields, including the service name and status', () {
       final json = {
         'id': 'appointment-1',
         'serviceId': 'service-1',
-        'date': '2026-06-15',
+        'service': {'name': 'Urbanisme'},
+        'startsAt': '2026-06-15T07:30:00.000Z',
+        'endsAt': '2026-06-15T08:00:00.000Z',
         'message': 'Besoin d un document',
         'status': 'CONFIRME',
       };
@@ -67,30 +71,84 @@ void main() {
 
       expect(model.id, 'appointment-1');
       expect(model.serviceId, 'service-1');
-      expect(model.date, DateTime.parse('2026-06-15'));
+      expect(model.serviceName, 'Urbanisme');
+      expect(model.startsAt, DateTime.parse('2026-06-15T07:30:00.000Z'));
+      expect(model.endsAt, DateTime.parse('2026-06-15T08:00:00.000Z'));
       expect(model.message, 'Besoin d un document');
       expect(model.status, AppointmentStatus.confirme);
     });
 
-    test('fromJson defaults status to null when absent', () {
+    test('fromJson accepts a missing message', () {
       final model = AppointmentModel.fromJson({
         'id': 'appointment-2',
         'serviceId': 'service-1',
-        'date': '2026-06-15',
+        'service': {'name': 'Urbanisme'},
+        'startsAt': '2026-06-15T07:30:00.000Z',
+        'endsAt': '2026-06-15T08:00:00.000Z',
         'message': null,
+        'status': 'DEMANDE',
       });
 
-      expect(model.status, isNull);
+      expect(model.message, isNull);
+      expect(model.status, AppointmentStatus.demande);
     });
+  });
 
-    test('toJson formats date and omits empty message', () {
-      final model = AppointmentModel(
+  group('AppointmentRequestModel', () {
+    test(
+      'toJson sends the start as a UTC instant and omits an empty message',
+      () {
+        final model = AppointmentRequestModel(
+          serviceId: 'service-1',
+          startsAt: DateTime.utc(2026, 6, 15, 7, 30),
+          message: '',
+        );
+
+        expect(model.toJson(), {
+          'serviceId': 'service-1',
+          'startsAt': '2026-06-15T07:30:00.000Z',
+        });
+      },
+    );
+
+    test('toJson keeps a non-empty message', () {
+      final model = AppointmentRequestModel(
         serviceId: 'service-1',
-        date: DateTime(2026, 6, 15),
-        message: '',
+        startsAt: DateTime.utc(2026, 6, 15, 7, 30),
+        message: 'Permis',
       );
 
-      expect(model.toJson(), {'serviceId': 'service-1', 'date': '2026-06-15'});
+      expect(model.toJson()['message'], 'Permis');
+    });
+  });
+
+  group('groupSlotsByDay', () {
+    AppointmentSlot slotAt(DateTime start) => AppointmentSlot(
+      startsAt: start,
+      endsAt: start.add(const Duration(minutes: 30)),
+    );
+
+    test('groups slots under their local calendar day, in order', () {
+      final morning = DateTime(2026, 10, 14, 9);
+      final later = DateTime(2026, 10, 14, 14, 30);
+      final nextDay = DateTime(2026, 10, 15, 9);
+
+      final days = groupSlotsByDay([
+        slotAt(morning),
+        slotAt(later),
+        slotAt(nextDay),
+      ]);
+
+      expect(days.keys.toList(), [
+        DateTime(2026, 10, 14),
+        DateTime(2026, 10, 15),
+      ]);
+      expect(days[DateTime(2026, 10, 14)], hasLength(2));
+      expect(days[DateTime(2026, 10, 15)], hasLength(1));
+    });
+
+    test('returns nothing for no slot', () {
+      expect(groupSlotsByDay(const []), isEmpty);
     });
   });
 
@@ -192,18 +250,21 @@ void main() {
       expect(model.isVotable, isFalse);
     });
 
-    test('fromJson defaults opensAt/closesAt to null and isVotable to true', () {
-      final model = PollModel.fromJson({
-        'id': 'poll-2',
-        'question': 'Quel projet prioriser ?',
-        'isActive': true,
-        'options': <Map<String, dynamic>>[],
-      });
+    test(
+      'fromJson defaults opensAt/closesAt to null and isVotable to true',
+      () {
+        final model = PollModel.fromJson({
+          'id': 'poll-2',
+          'question': 'Quel projet prioriser ?',
+          'isActive': true,
+          'options': <Map<String, dynamic>>[],
+        });
 
-      expect(model.opensAt, isNull);
-      expect(model.closesAt, isNull);
-      expect(model.isVotable, isTrue);
-    });
+        expect(model.opensAt, isNull);
+        expect(model.closesAt, isNull);
+        expect(model.isVotable, isTrue);
+      },
+    );
   });
 
   group('Poll', () {
@@ -284,10 +345,13 @@ void main() {
       expect(entry.iconCode, '04d');
     });
 
-    test('fromJson leaves weather null when civic_api has not cached it yet', () {
-      final model = CitySettingsModel.fromJson({'name': 'Bessan'});
+    test(
+      'fromJson leaves weather null when civic_api has not cached it yet',
+      () {
+        final model = CitySettingsModel.fromJson({'name': 'Bessan'});
 
-      expect(model.weather, isNull);
-    });
+        expect(model.weather, isNull);
+      },
+    );
   });
 }

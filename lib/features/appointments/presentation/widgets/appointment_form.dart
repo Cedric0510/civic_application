@@ -1,10 +1,13 @@
 import 'package:civic_app/core/errors/app_exception.dart';
-import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
+import 'package:civic_app/features/appointments/domain/entities/appointment_request.dart';
+import 'package:civic_app/features/appointments/domain/entities/appointment_slot.dart';
 import 'package:civic_app/features/appointments/presentation/controllers/appointment_controller.dart';
+import 'package:civic_app/features/appointments/presentation/controllers/appointment_providers.dart';
 import 'package:civic_app/features/appointments/presentation/widgets/service_dropdown.dart';
+import 'package:civic_app/features/appointments/presentation/widgets/slot_picker.dart';
+import 'package:civic_app/shared/widgets/error_retry_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class AppointmentForm extends ConsumerStatefulWidget {
   const AppointmentForm({super.key});
@@ -15,42 +18,24 @@ class AppointmentForm extends ConsumerStatefulWidget {
 
 class _AppointmentFormState extends ConsumerState<AppointmentForm> {
   final _formKey = GlobalKey<FormState>();
-  final _dateController = TextEditingController();
   final _messageController = TextEditingController();
   String? _selectedServiceId;
-  DateTime? _selectedDate;
+  AppointmentSlot? _selectedSlot;
 
   @override
   void dispose() {
-    _dateController.dispose();
     _messageController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: now.add(const Duration(days: 1)),
-      firstDate: now.add(const Duration(days: 1)),
-      lastDate: now.add(const Duration(days: 90)),
-    );
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-        _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
-      });
-    }
-  }
-
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate() || _selectedSlot == null) return;
     await ref
         .read(appointmentControllerProvider.notifier)
         .submit(
-          Appointment(
+          AppointmentRequest(
             serviceId: _selectedServiceId!,
-            date: _selectedDate!,
+            startsAt: _selectedSlot!.startsAt,
             message: _messageController.text.trim().isEmpty
                 ? null
                 : _messageController.text.trim(),
@@ -58,14 +43,18 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
         );
   }
 
+  void _refreshSlots() {
+    if (_selectedServiceId != null) {
+      ref.invalidate(appointmentSlotsProvider(_selectedServiceId!));
+    }
+    setState(() => _selectedSlot = null);
+  }
+
   void _reset() {
+    _refreshSlots();
     _formKey.currentState?.reset();
-    _dateController.clear();
     _messageController.clear();
-    setState(() {
-      _selectedServiceId = null;
-      _selectedDate = null;
-    });
+    setState(() => _selectedServiceId = null);
     ref.read(appointmentControllerProvider.notifier).reset();
   }
 
@@ -83,6 +72,7 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
+        _refreshSlots();
       } else if (next is AsyncData && previous is AsyncLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -94,6 +84,7 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
     });
 
     final isLoading = ref.watch(appointmentControllerProvider).isLoading;
+    final serviceId = _selectedServiceId;
 
     return Form(
       key: _formKey,
@@ -101,23 +92,35 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ServiceDropdown(
-            onChanged: (value) => setState(() => _selectedServiceId = value),
+            onChanged: (value) => setState(() {
+              _selectedServiceId = value;
+              _selectedSlot = null;
+            }),
           ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _dateController,
-            readOnly: true,
-            onTap: _pickDate,
-            decoration: const InputDecoration(
-              labelText: 'Date souhaitée',
-              border: OutlineInputBorder(),
-              suffixIcon: Icon(Icons.calendar_today_outlined),
-            ),
-            validator: (_) => _selectedDate == null
-                ? 'Veuillez sélectionner une date.'
-                : null,
-          ),
-          const SizedBox(height: 16),
+          if (serviceId != null) ...[
+            const SizedBox(height: 20),
+            ref
+                .watch(appointmentSlotsProvider(serviceId))
+                .when(
+                  loading: () => const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                  error: (error, stackTrace) => ErrorRetryWidget(
+                    message: 'Impossible de charger les créneaux.',
+                    onRetry: () =>
+                        ref.invalidate(appointmentSlotsProvider(serviceId)),
+                  ),
+                  data: (slots) => SlotPicker(
+                    slots: slots,
+                    selected: _selectedSlot,
+                    onSelected: (slot) => setState(() => _selectedSlot = slot),
+                  ),
+                ),
+          ],
+          const SizedBox(height: 20),
           TextFormField(
             controller: _messageController,
             decoration: const InputDecoration(
@@ -129,7 +132,7 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
           ),
           const SizedBox(height: 24),
           FilledButton(
-            onPressed: isLoading ? null : _submit,
+            onPressed: isLoading || _selectedSlot == null ? null : _submit,
             child: isLoading
                 ? const SizedBox(
                     height: 20,

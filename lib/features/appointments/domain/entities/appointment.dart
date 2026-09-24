@@ -18,25 +18,33 @@ enum AppointmentStatus {
   }
 }
 
-// name/email disparaissent : le citoyen est maintenant un compte
-// authentifié (dérivé du JWT côté civic_api), plus un simple formulaire
-// anonyme. service (texte libre) devient serviceId (vraie relation).
-// status est nul avant l'envoi -- civic_api le détermine (DEMANDE par défaut).
 class Appointment extends Equatable {
   const Appointment({
-    this.id,
+    required this.id,
     required this.serviceId,
-    required this.date,
+    required this.serviceName,
+    required this.startsAt,
+    required this.endsAt,
+    required this.status,
     this.message,
-    this.status,
   });
 
-  final String? id;
+  final String id;
   final String serviceId;
-  final DateTime date;
+  final String serviceName;
+  final DateTime startsAt;
+  final DateTime endsAt;
+  final AppointmentStatus status;
   final String? message;
-  final AppointmentStatus? status;
 
   @override
-  List<Object?> get props => [id, serviceId, date, message, status];
+  List<Object?> get props => [
+    id,
+    serviceId,
+    serviceName,
+    startsAt,
+    endsAt,
+    status,
+    message,
+  ];
 }

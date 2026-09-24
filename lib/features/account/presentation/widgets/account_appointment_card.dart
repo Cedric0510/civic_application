@@ -1,10 +1,8 @@
 import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
-import 'package:civic_app/features/services/presentation/controllers/services_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class AccountAppointmentCard extends ConsumerWidget {
+class AccountAppointmentCard extends StatelessWidget {
   const AccountAppointmentCard({super.key, required this.appointment});
 
   final Appointment appointment;
@@ -21,16 +19,11 @@ class AccountAppointmentCard extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dateStr = DateFormat('dd/MM/yyyy').format(appointment.date);
-    // serviceId est un identifiant technique : on résout le nom lisible via
-    // la liste des services déjà chargée par ailleurs (même commune).
-    final servicesAsync = ref.watch(servicesControllerProvider);
-    final serviceName = servicesAsync.valueOrNull
-        ?.where((service) => service.id == appointment.serviceId)
-        .firstOrNull
-        ?.name;
+    final dateStr = DateFormat(
+      "dd/MM/yyyy 'à' HH:mm",
+    ).format(appointment.startsAt.toLocal());
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
@@ -60,32 +53,31 @@ class AccountAppointmentCard extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          serviceName ?? 'Service',
+                          appointment.serviceName,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      if (appointment.status != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _statusColor(
-                              appointment.status!,
-                            ).withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            appointment.status!.label,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: _statusColor(appointment.status!),
-                              fontWeight: FontWeight.w600,
-                            ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _statusColor(
+                            appointment.status,
+                          ).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          appointment.status.label,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: _statusColor(appointment.status),
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),

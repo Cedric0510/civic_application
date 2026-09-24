@@ -1,34 +1,25 @@
 import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
-import 'package:intl/intl.dart';
 
 class AppointmentModel extends Appointment {
   const AppointmentModel({
-    super.id,
+    required super.id,
     required super.serviceId,
-    required super.date,
+    required super.serviceName,
+    required super.startsAt,
+    required super.endsAt,
+    required super.status,
     super.message,
-    super.status,
   });
 
   factory AppointmentModel.fromJson(Map<String, dynamic> json) {
     return AppointmentModel(
-      id: json['id'] as String?,
+      id: json['id'] as String,
       serviceId: json['serviceId'] as String,
-      date: DateTime.parse(json['date'] as String),
+      serviceName: (json['service'] as Map<String, dynamic>)['name'] as String,
+      startsAt: DateTime.parse(json['startsAt'] as String),
+      endsAt: DateTime.parse(json['endsAt'] as String),
+      status: AppointmentStatus.fromApiValue(json['status'] as String),
       message: json['message'] as String?,
-      status: json['status'] != null
-          ? AppointmentStatus.fromApiValue(json['status'] as String)
-          : null,
     );
-  }
-
-  // Seuls les champs attendus par POST /appointments : citizenId/communeId
-  // sont dérivés du JWT côté civic_api.
-  Map<String, dynamic> toJson() {
-    return {
-      'serviceId': serviceId,
-      'date': DateFormat('yyyy-MM-dd').format(date),
-      if (message != null && message!.isNotEmpty) 'message': message,
-    };
   }
 }
