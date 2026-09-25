@@ -5,6 +5,7 @@ import 'package:civic_app/features/auth/presentation/controllers/auth_controller
 import 'package:civic_app/features/auth/presentation/widgets/commune_picker_field.dart';
 import 'package:civic_app/features/auth/presentation/widgets/terms_consent_field.dart';
 import 'package:civic_app/features/legal/domain/entities/legal_texts.dart';
+import 'package:civic_app/shared/utils/form_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,9 @@ class AuthPage extends ConsumerStatefulWidget {
 class _AuthPageState extends ConsumerState<AuthPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final _emailConfirmationController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordConfirmationController = TextEditingController();
   final _invitationCodeController = TextEditingController();
   bool _isSignUp = false;
   bool _hasInvitationCode = false;
@@ -30,7 +33,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   @override
   void dispose() {
     _emailController.dispose();
+    _emailConfirmationController.dispose();
     _passwordController.dispose();
+    _passwordConfirmationController.dispose();
     _invitationCodeController.dispose();
     super.dispose();
   }
@@ -172,19 +177,27 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               ),
                               keyboardType: TextInputType.emailAddress,
                               autocorrect: false,
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'L\'adresse e-mail est requise.';
-                                }
-                                final emailRegex = RegExp(
-                                  r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$',
-                                );
-                                if (!emailRegex.hasMatch(value.trim())) {
-                                  return 'Entrez une adresse e-mail valide.';
-                                }
-                                return null;
-                              },
+                              validator: validateEmail,
                             ),
+                            if (_isSignUp) ...[
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _emailConfirmationController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Confirmer l\'adresse e-mail',
+                                  prefixIcon: Icon(
+                                    Icons.mark_email_read_outlined,
+                                  ),
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.emailAddress,
+                                autocorrect: false,
+                                validator: (value) => validateEmailConfirmation(
+                                  value,
+                                  _emailController.text,
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _passwordController,
@@ -217,6 +230,23 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 return null;
                               },
                             ),
+                            if (_isSignUp) ...[
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _passwordConfirmationController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Confirmer le mot de passe',
+                                  prefixIcon: Icon(Icons.lock_reset_outlined),
+                                  border: OutlineInputBorder(),
+                                ),
+                                obscureText: _obscurePassword,
+                                validator: (value) =>
+                                    validatePasswordConfirmation(
+                                      value,
+                                      _passwordController.text,
+                                    ),
+                              ),
+                            ],
                             if (!_isSignUp)
                               Align(
                                 alignment: Alignment.centerRight,
@@ -316,8 +346,11 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             TextButton(
                               onPressed: isLoading
                                   ? null
-                                  : () =>
-                                        setState(() => _isSignUp = !_isSignUp),
+                                  : () => setState(() {
+                                      _isSignUp = !_isSignUp;
+                                      _emailConfirmationController.clear();
+                                      _passwordConfirmationController.clear();
+                                    }),
                               child: Text(
                                 _isSignUp
                                     ? 'Déjà un compte ? Se connecter'

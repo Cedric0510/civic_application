@@ -96,14 +96,26 @@ Future<_RecordingAuthRepository> _openSignUp(WidgetTester tester) async {
   return repository;
 }
 
-Future<void> _fillIdentity(WidgetTester tester) async {
+Future<void> _fillIdentity(
+  WidgetTester tester, {
+  String emailConfirmation = 'martine@boulangerie.fr',
+  String passwordConfirmation = 'motdepasse1',
+}) async {
   await tester.enterText(
     find.widgetWithText(TextFormField, 'Adresse e-mail'),
     'martine@boulangerie.fr',
   );
   await tester.enterText(
+    find.widgetWithText(TextFormField, 'Confirmer l\'adresse e-mail'),
+    emailConfirmation,
+  );
+  await tester.enterText(
     find.widgetWithText(TextFormField, 'Mot de passe'),
     'motdepasse1',
+  );
+  await tester.enterText(
+    find.widgetWithText(TextFormField, 'Confirmer le mot de passe'),
+    passwordConfirmation,
   );
   await tester.tap(find.byType(DropdownButtonFormField<CommuneRef>));
   await tester.pumpAndSettle();
@@ -221,6 +233,104 @@ void main() {
     await _submit(tester);
 
     expect(repository.lastAcceptedTerms, isTrue);
+  });
+
+  group('confirmations', () {
+    testWidgets('asks for the e-mail and the password twice, only to sign up', (
+      tester,
+    ) async {
+      await _openSignUp(tester);
+
+      expect(find.text('Confirmer l\'adresse e-mail'), findsOneWidget);
+      expect(find.text('Confirmer le mot de passe'), findsOneWidget);
+
+      await tester.tap(find.text('Déjà un compte ? Se connecter'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Confirmer l\'adresse e-mail'), findsNothing);
+      expect(find.text('Confirmer le mot de passe'), findsNothing);
+    });
+
+    testWidgets('creates no account when the two e-mail addresses differ', (
+      tester,
+    ) async {
+      final repository = await _openSignUp(tester);
+      await _fillIdentity(tester, emailConfirmation: 'martine@boulangeri.fr');
+
+      await _submit(tester);
+
+      expect(
+        find.text('Les deux adresses e-mail ne sont pas identiques.'),
+        findsOneWidget,
+      );
+      expect(repository.signUpCalls, 0);
+    });
+
+    testWidgets('creates no account when the two passwords differ', (
+      tester,
+    ) async {
+      final repository = await _openSignUp(tester);
+      await _fillIdentity(tester, passwordConfirmation: 'motdepasse2');
+
+      await _submit(tester);
+
+      expect(
+        find.text('Les deux mots de passe ne sont pas identiques.'),
+        findsOneWidget,
+      );
+      expect(repository.signUpCalls, 0);
+    });
+
+    testWidgets('asks to confirm rather than accepting an empty confirmation', (
+      tester,
+    ) async {
+      final repository = await _openSignUp(tester);
+      await _fillIdentity(
+        tester,
+        emailConfirmation: '',
+        passwordConfirmation: '',
+      );
+
+      await _submit(tester);
+
+      expect(find.text('Confirmez l\'adresse e-mail.'), findsOneWidget);
+      expect(find.text('Confirmez le mot de passe.'), findsOneWidget);
+      expect(repository.signUpCalls, 0);
+    });
+
+    testWidgets('does not mind capitals or spaces around the e-mail address', (
+      tester,
+    ) async {
+      final repository = await _openSignUp(tester);
+      await _fillIdentity(
+        tester,
+        emailConfirmation: ' Martine@Boulangerie.fr ',
+      );
+
+      await _submit(tester);
+
+      expect(repository.signUpCalls, 1);
+    });
+
+    testWidgets('does not ask for the confirmations again after a round trip', (
+      tester,
+    ) async {
+      await _openSignUp(tester);
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Confirmer le mot de passe'),
+        'brouillon',
+      );
+
+      await tester.tap(find.text('Déjà un compte ? Se connecter'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Pas encore de compte ? S\'inscrire'));
+      await tester.pumpAndSettle();
+
+      final field = tester.widget<TextFormField>(
+        find.widgetWithText(TextFormField, 'Confirmer le mot de passe'),
+      );
+      expect(field.controller!.text, isEmpty);
+    });
   });
 
   testWidgets('asks to choose the commune before reading a legal text', (

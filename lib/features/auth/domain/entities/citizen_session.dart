@@ -18,20 +18,26 @@ enum CitizenRole {
 }
 
 class ManagedCommerceRef extends Equatable {
-  const ManagedCommerceRef({required this.id, required this.name});
+  const ManagedCommerceRef({
+    required this.id,
+    required this.name,
+    this.isChief = false,
+  });
 
   final String id;
   final String name;
+  final bool isChief;
 
   factory ManagedCommerceRef.fromJson(Map<String, dynamic> json) {
     return ManagedCommerceRef(
       id: json['id'] as String,
       name: json['name'] as String,
+      isChief: json['isChief'] as bool? ?? false,
     );
   }
 
   @override
-  List<Object?> get props => [id, name];
+  List<Object?> get props => [id, name, isChief];
 }
 
 // Identité de session du citoyen connecté : sa commune (pilote tout le

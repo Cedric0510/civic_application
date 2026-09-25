@@ -1,5 +1,6 @@
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/auth/presentation/controllers/password_reset_controller.dart';
+import 'package:civic_app/shared/utils/form_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -155,16 +156,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             ),
             keyboardType: TextInputType.emailAddress,
             autocorrect: false,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'L\'adresse e-mail est requise.';
-              }
-              final emailRegex = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
-              if (!emailRegex.hasMatch(value.trim())) {
-                return 'Entrez une adresse e-mail valide.';
-              }
-              return null;
-            },
+            validator: validateEmail,
           ),
           const SizedBox(height: 24),
           FilledButton(

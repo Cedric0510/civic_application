@@ -1,6 +1,8 @@
 import 'package:civic_app/core/theme/feature_colors.dart';
 import 'package:civic_app/shared/widgets/feature_app_bar.dart';
+import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/commerces/presentation/controllers/my_commerce_controller.dart';
+import 'package:civic_app/features/commerces/presentation/widgets/commerce_team_section.dart';
 import 'package:civic_app/features/commerces/presentation/widgets/my_commerce_form.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,9 @@ class MyCommercePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final commerceAsync = ref.watch(myCommerceProvider);
+    final isChief =
+        ref.watch(authStateProvider).valueOrNull?.managedCommerce?.isChief ??
+        false;
 
     return Scaffold(
       body: CustomScrollView(
@@ -38,7 +43,16 @@ class MyCommercePage extends ConsumerWidget {
             data: (commerce) => SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: MyCommerceForm(commerce: commerce),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    MyCommerceForm(commerce: commerce),
+                    if (isChief) ...[
+                      const SizedBox(height: 32),
+                      CommerceTeamSection(commerceId: commerce.id),
+                    ],
+                  ],
+                ),
               ),
             ),
           ),
