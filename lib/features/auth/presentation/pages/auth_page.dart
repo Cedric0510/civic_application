@@ -1,6 +1,7 @@
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/accessibility/presentation/widgets/comfort_mode_tile.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
+import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:civic_app/features/auth/presentation/widgets/commune_picker_field.dart';
 import 'package:civic_app/features/auth/presentation/widgets/terms_consent_field.dart';
@@ -45,7 +46,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (_isSignUp) {
-      await ref
+      final pending = await ref
           .read(authControllerProvider.notifier)
           .signUp(
             email: email,
@@ -56,11 +57,37 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                 ? _invitationCodeController.text
                 : null,
           );
+      if (mounted && pending != null) _openVerification(pending);
     } else {
       await ref
           .read(authControllerProvider.notifier)
           .signIn(email: email, password: password);
     }
+  }
+
+  void _openVerification(SignUpNeedsVerification pending) {
+    context.go(
+      Uri(
+        path: '/verify-email',
+        queryParameters: {'email': pending.email},
+      ).toString(),
+      extra: pending.resendAvailableAt,
+    );
+  }
+
+  void _openVerificationWithKnownCode() {
+    final email = _emailController.text.trim();
+    if (validateEmail(email) != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Saisissez d\'abord votre adresse e-mail.'),
+        ),
+      );
+      return;
+    }
+    context.go(
+      Uri(path: '/verify-email', queryParameters: {'email': email}).toString(),
+    );
   }
 
   void _openLegalDocument(LegalDocument document) {
@@ -307,6 +334,17 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               ),
                             ],
                             if (_isSignUp) ...[
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: TextButton(
+                                  onPressed: isLoading
+                                      ? null
+                                      : _openVerificationWithKnownCode,
+                                  child: const Text(
+                                    'J\'ai déjà reçu mon code par e-mail',
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: 8),
                               TermsConsentField(
                                 accepted: _acceptedTerms,

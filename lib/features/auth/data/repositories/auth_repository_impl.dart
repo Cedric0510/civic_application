@@ -1,5 +1,6 @@
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
 import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
+import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -12,7 +13,7 @@ class AuthRepositoryImpl implements AuthRepository {
       _datasource.signIn(email: email, password: password);
 
   @override
-  Future<void> signUp({
+  Future<SignUpOutcome> signUp({
     required String email,
     required String password,
     required String communeSlug,
@@ -25,6 +26,14 @@ class AuthRepositoryImpl implements AuthRepository {
     acceptedTerms: acceptedTerms,
     invitationCode: invitationCode,
   );
+
+  @override
+  Future<void> verifySignUp({required String email, required String code}) =>
+      _datasource.verifySignUp(email: email, code: code);
+
+  @override
+  Future<SignUpNeedsVerification> resendSignUpCode({required String email}) =>
+      _datasource.resendSignUpCode(email: email);
 
   @override
   Future<void> requestPasswordReset({required String email}) =>

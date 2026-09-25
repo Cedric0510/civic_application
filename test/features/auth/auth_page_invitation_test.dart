@@ -1,3 +1,4 @@
+import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
@@ -22,7 +23,7 @@ class _RecordingAuthRepository implements AuthRepository {
   bool? lastAcceptedTerms;
 
   @override
-  Future<void> signUp({
+  Future<SignUpOutcome> signUp({
     required String email,
     required String password,
     required String communeSlug,
@@ -33,7 +34,23 @@ class _RecordingAuthRepository implements AuthRepository {
     lastCommuneSlug = communeSlug;
     lastInvitationCode = invitationCode;
     lastAcceptedTerms = acceptedTerms;
+    return const SignUpCompleted();
   }
+
+  @override
+  Future<void> verifySignUp({
+    required String email,
+    required String code,
+  }) async {}
+
+  @override
+  Future<SignUpNeedsVerification> resendSignUpCode({
+    required String email,
+  }) async => SignUpNeedsVerification(
+    email: email,
+    expiresAt: DateTime(2100),
+    resendAvailableAt: DateTime(2100),
+  );
 
   @override
   Future<void> signIn({

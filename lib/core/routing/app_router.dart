@@ -7,6 +7,7 @@ import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/auth/presentation/pages/forgot_password_page.dart';
+import 'package:civic_app/features/auth/presentation/pages/verify_email_page.dart';
 import 'package:civic_app/features/commerces/presentation/pages/commerces_page.dart';
 import 'package:civic_app/features/feedback/presentation/pages/feedback_page.dart';
 import 'package:civic_app/features/legal/domain/entities/legal_texts.dart';
@@ -53,6 +54,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/forgot-password',
         builder: (context, state) => ForgotPasswordPage(
           initialEmail: state.uri.queryParameters['email'],
+        ),
+      ),
+      GoRoute(
+        path: '/verify-email',
+        redirect: (context, state) =>
+            (state.uri.queryParameters['email'] ?? '').isEmpty ? '/auth' : null,
+        builder: (context, state) => VerifyEmailPage(
+          email: state.uri.queryParameters['email']!,
+          resendAvailableAt: state.extra as DateTime?,
         ),
       ),
       GoRoute(path: '/home', builder: (context, state) => const HomePage()),

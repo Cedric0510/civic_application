@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:civic_app/core/auth/token_storage.dart';
+import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
 import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
+import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -37,9 +39,174 @@ class _InMemoryTokenStorage extends TokenStorage {
   Future<Map<String, dynamic>?> readCommune() async => _commune;
 }
 
+AuthApiDatasource _datasource(
+  _InMemoryTokenStorage storage,
+  Future<http.Response> Function(http.Request request) handler,
+) => AuthApiDatasource(ApiClient(MockClient(handler), storage), storage);
+
+http.Response _json(Object body, [int status = 201]) => http.Response(
+  jsonEncode(body),
+  status,
+  headers: {'content-type': 'application/json'},
+);
+
 void main() {
   setUpAll(() {
     dotenv.testLoad(fileInput: 'API_BASE_URL=http://test.local');
+  });
+
+  group('AuthApiDatasource sign-up verification', () {
+    test(
+      'a sign-up that needs a code stores no token and reports the times',
+      () async {
+        final storage = _InMemoryTokenStorage();
+        final datasource = _datasource(
+          storage,
+          (_) async => _json({
+            'status': 'verification_required',
+            'email': 'martine@boulangerie.fr',
+            'expiresAt': '2026-09-25T10:30:00.000Z',
+            'resendAvailableAt': '2026-09-25T10:01:00.000Z',
+          }),
+        );
+
+        final outcome = await datasource.signUp(
+          email: 'martine@boulangerie.fr',
+          password: 'motdepasse1',
+          communeSlug: 'bessan',
+          acceptedTerms: true,
+        );
+
+        expect(
+          outcome,
+          SignUpNeedsVerification(
+            email: 'martine@boulangerie.fr',
+            expiresAt: DateTime.parse('2026-09-25T10:30:00.000Z'),
+            resendAvailableAt: DateTime.parse('2026-09-25T10:01:00.000Z'),
+          ),
+        );
+        expect(await storage.read(), isNull);
+      },
+    );
+
+    test('a sign-up accepted at once (invitation) stores the token', () async {
+      final storage = _InMemoryTokenStorage();
+      final datasource = _datasource(
+        storage,
+        (_) async => _json({
+          'status': 'created',
+          'accessToken': 'jwt-1',
+          'citizen': {'id': 'c1'},
+        }),
+      );
+
+      final outcome = await datasource.signUp(
+        email: 'martine@boulangerie.fr',
+        password: 'motdepasse1',
+        communeSlug: 'bessan',
+        acceptedTerms: true,
+        invitationCode: ' K7QM-2XPD ',
+      );
+
+      expect(outcome, const SignUpCompleted());
+      expect(await storage.read(), 'jwt-1');
+    });
+
+    test(
+      'sends the sign-up details, the consent and the trimmed invitation code',
+      () async {
+        Map<String, dynamic>? sent;
+        final datasource = _datasource(_InMemoryTokenStorage(), (
+          request,
+        ) async {
+          sent = jsonDecode(request.body) as Map<String, dynamic>;
+          return _json({'status': 'created', 'accessToken': 'jwt-1'});
+        });
+
+        await datasource.signUp(
+          email: 'martine@boulangerie.fr',
+          password: 'motdepasse1',
+          communeSlug: 'bessan',
+          acceptedTerms: true,
+          invitationCode: ' K7QM-2XPD ',
+        );
+
+        expect(sent, {
+          'email': 'martine@boulangerie.fr',
+          'password': 'motdepasse1',
+          'communeSlug': 'bessan',
+          'acceptTerms': true,
+          'invitationCode': 'K7QM-2XPD',
+        });
+      },
+    );
+
+    test('the right code stores the token of the new account', () async {
+      final storage = _InMemoryTokenStorage();
+      String? path;
+      Map<String, dynamic>? sent;
+      final datasource = _datasource(storage, (request) async {
+        path = request.url.path;
+        sent = jsonDecode(request.body) as Map<String, dynamic>;
+        return _json({
+          'accessToken': 'jwt-2',
+          'citizen': {'id': 'c1'},
+        });
+      });
+
+      await datasource.verifySignUp(
+        email: 'martine@boulangerie.fr',
+        code: 'K7QM-2XPD',
+      );
+
+      expect(path, '/citizens/signup/verify');
+      expect(sent, {'email': 'martine@boulangerie.fr', 'code': 'K7QM-2XPD'});
+      expect(await storage.read(), 'jwt-2');
+    });
+
+    test('a refused code stores nothing and passes the reason on', () async {
+      final storage = _InMemoryTokenStorage();
+      final datasource = _datasource(
+        storage,
+        (_) async =>
+            _json({'message': 'Ce code est invalide ou a expiré.'}, 400),
+      );
+
+      await expectLater(
+        datasource.verifySignUp(email: 'a@b.fr', code: 'AAAA-BBBB'),
+        throwsA(
+          isA<AppException>().having(
+            (e) => e.message,
+            'message',
+            'Ce code est invalide ou a expiré.',
+          ),
+        ),
+      );
+      expect(await storage.read(), isNull);
+    });
+
+    test('asks for a new code and reads the new waiting time', () async {
+      String? path;
+      final datasource = _datasource(_InMemoryTokenStorage(), (request) async {
+        path = request.url.path;
+        return _json({
+          'status': 'verification_required',
+          'email': 'martine@boulangerie.fr',
+          'expiresAt': '2026-09-25T11:00:00.000Z',
+          'resendAvailableAt': '2026-09-25T10:31:00.000Z',
+        }, 200);
+      });
+
+      final sent = await datasource.resendSignUpCode(
+        email: 'martine@boulangerie.fr',
+      );
+
+      expect(path, '/citizens/signup/resend');
+      expect(
+        sent.resendAvailableAt,
+        DateTime.parse('2026-09-25T10:31:00.000Z'),
+      );
+    });
   });
 
   group('AuthApiDatasource.fetchSession', () {

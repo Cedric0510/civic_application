@@ -1,3 +1,4 @@
+import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/network/api_client.dart';
@@ -32,6 +33,12 @@ class _FakeAuthRepository implements AuthRepository {
   String? lastInvitationCode;
   bool? lastAcceptedTerms;
 
+  SignUpOutcome? signUpOutcome;
+  int verifyCalls = 0;
+  String? lastCode;
+  int resendCalls = 0;
+  Object? verifyError;
+  Object? resendError;
   Object? signInError;
   Object? signUpError;
   Object? signOutError;
@@ -46,7 +53,7 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> signUp({
+  Future<SignUpOutcome> signUp({
     required String email,
     required String password,
     required String communeSlug,
@@ -60,6 +67,31 @@ class _FakeAuthRepository implements AuthRepository {
     lastInvitationCode = invitationCode;
     lastAcceptedTerms = acceptedTerms;
     if (signUpError != null) throw signUpError!;
+    return signUpOutcome ?? const SignUpCompleted();
+  }
+
+  @override
+  Future<void> verifySignUp({
+    required String email,
+    required String code,
+  }) async {
+    verifyCalls++;
+    lastEmail = email;
+    lastCode = code;
+    if (verifyError != null) throw verifyError!;
+  }
+
+  @override
+  Future<SignUpNeedsVerification> resendSignUpCode({
+    required String email,
+  }) async {
+    resendCalls++;
+    if (resendError != null) throw resendError!;
+    return SignUpNeedsVerification(
+      email: email,
+      expiresAt: DateTime(2100),
+      resendAvailableAt: DateTime(2100, 1, 2),
+    );
   }
 
   @override
@@ -201,6 +233,103 @@ void main() {
       expect(container.read(authControllerProvider).hasError, isFalse);
     },
   );
+
+  group('sign-up verification', () {
+    final pending = SignUpNeedsVerification(
+      email: 'new@b.com',
+      expiresAt: DateTime(2100),
+      resendAvailableAt: DateTime(2100),
+    );
+
+    Future<SignUpNeedsVerification?> signUp() => container
+        .read(authControllerProvider.notifier)
+        .signUp(
+          email: 'new@b.com',
+          password: 'secret123',
+          communeSlug: 'bessan',
+          acceptedTerms: true,
+        );
+
+    test(
+      'a sign-up that needs a code hands it back and opens no session',
+      () async {
+        fakeRepo.signUpOutcome = pending;
+        final callsBefore = fakeDatasource.fetchSessionCalls;
+
+        final result = await signUp();
+
+        expect(result, pending);
+        expect(fakeDatasource.fetchSessionCalls, callsBefore);
+        expect(container.read(authControllerProvider).hasError, isFalse);
+      },
+    );
+
+    test('a sign-up that completes on its own opens the session', () async {
+      final callsBefore = fakeDatasource.fetchSessionCalls;
+
+      final result = await signUp();
+
+      expect(result, isNull);
+      expect(fakeDatasource.fetchSessionCalls, greaterThan(callsBefore));
+    });
+
+    test('a refused sign-up hands back nothing and shows the error', () async {
+      fakeRepo.signUpError = Exception('Un compte existe déjà avec cet email.');
+
+      final result = await signUp();
+
+      expect(result, isNull);
+      expect(container.read(authControllerProvider).hasError, isTrue);
+    });
+
+    test('the right code opens the session', () async {
+      final callsBefore = fakeDatasource.fetchSessionCalls;
+
+      await container
+          .read(authControllerProvider.notifier)
+          .verifySignUp(email: 'new@b.com', code: 'K7QM-2XPD');
+
+      expect(fakeRepo.verifyCalls, 1);
+      expect(fakeRepo.lastEmail, 'new@b.com');
+      expect(fakeRepo.lastCode, 'K7QM-2XPD');
+      expect(fakeDatasource.fetchSessionCalls, greaterThan(callsBefore));
+    });
+
+    test('a refused code shows the error and opens no session', () async {
+      fakeRepo.verifyError = Exception('Ce code est invalide ou a expiré.');
+      final callsBefore = fakeDatasource.fetchSessionCalls;
+
+      await container
+          .read(authControllerProvider.notifier)
+          .verifySignUp(email: 'new@b.com', code: 'AAAA-BBBB');
+
+      expect(container.read(authControllerProvider).hasError, isTrue);
+      expect(fakeDatasource.fetchSessionCalls, callsBefore);
+    });
+
+    test('a new code is handed back without opening any session', () async {
+      final callsBefore = fakeDatasource.fetchSessionCalls;
+
+      final sent = await container
+          .read(authControllerProvider.notifier)
+          .resendSignUpCode(email: 'new@b.com');
+
+      expect(sent?.email, 'new@b.com');
+      expect(fakeRepo.resendCalls, 1);
+      expect(fakeDatasource.fetchSessionCalls, callsBefore);
+    });
+
+    test('a new code that cannot be sent hands back nothing', () async {
+      fakeRepo.resendError = const RateLimitException();
+
+      final sent = await container
+          .read(authControllerProvider.notifier)
+          .resendSignUpCode(email: 'new@b.com');
+
+      expect(sent, isNull);
+      expect(container.read(authControllerProvider).hasError, isTrue);
+    });
+  });
 
   test('signUp forwards the invitation code of a future commerçant', () async {
     await container

@@ -41,6 +41,14 @@ void main() {
       disabledModules: disabled,
     );
 
+    test(
+      'lets a visitor enter the code received by e-mail, but not a member',
+      () {
+        expect(redirect('/verify-email', isAuthenticated: false), isNull);
+        expect(redirect('/verify-email'), '/home');
+      },
+    );
+
     test('lets an authenticated citizen reach an enabled module', () {
       expect(redirect('/polls'), isNull);
       expect(redirect('/articles/42', disabled: {AppModule.polls}), isNull);

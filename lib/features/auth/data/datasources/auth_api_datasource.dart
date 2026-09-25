@@ -3,6 +3,7 @@ import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
+import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 
 class AuthApiDatasource {
   const AuthApiDatasource(this._api, this._tokenStorage);
@@ -18,7 +19,7 @@ class AuthApiDatasource {
     await _tokenStorage.save(token);
   }
 
-  Future<void> signUp({
+  Future<SignUpOutcome> signUp({
     required String email,
     required String password,
     required String communeSlug,
@@ -26,14 +27,48 @@ class AuthApiDatasource {
     String? invitationCode,
   }) async {
     final code = invitationCode?.trim();
-    final token = await _authenticate('/citizens/signup', {
+    final json =
+        await _api.post('/citizens/signup', {
+              'email': email,
+              'password': password,
+              'communeSlug': communeSlug,
+              'acceptTerms': acceptedTerms,
+              if (code != null && code.isNotEmpty) 'invitationCode': code,
+            })
+            as Map<String, dynamic>;
+    if (json['status'] == 'verification_required') {
+      return _pendingVerification(json);
+    }
+    await _tokenStorage.save(json['accessToken'] as String);
+    return const SignUpCompleted();
+  }
+
+  Future<void> verifySignUp({
+    required String email,
+    required String code,
+  }) async {
+    final token = await _authenticate('/citizens/signup/verify', {
       'email': email,
-      'password': password,
-      'communeSlug': communeSlug,
-      'acceptTerms': acceptedTerms,
-      if (code != null && code.isNotEmpty) 'invitationCode': code,
+      'code': code,
     });
     await _tokenStorage.save(token);
+  }
+
+  Future<SignUpNeedsVerification> resendSignUpCode({
+    required String email,
+  }) async {
+    final json =
+        await _api.post('/citizens/signup/resend', {'email': email})
+            as Map<String, dynamic>;
+    return _pendingVerification(json);
+  }
+
+  SignUpNeedsVerification _pendingVerification(Map<String, dynamic> json) {
+    return SignUpNeedsVerification(
+      email: json['email'] as String,
+      expiresAt: DateTime.parse(json['expiresAt'] as String),
+      resendAvailableAt: DateTime.parse(json['resendAvailableAt'] as String),
+    );
   }
 
   Future<void> requestPasswordReset({required String email}) async {

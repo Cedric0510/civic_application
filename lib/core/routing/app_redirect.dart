@@ -16,7 +16,11 @@ AppModule? moduleForLocation(String location) {
   return segments.isEmpty ? null : _moduleByRootSegment[segments.first];
 }
 
-const Set<String> _guestOnlyLocations = {'/auth', '/forgot-password'};
+const Set<String> _guestOnlyLocations = {
+  '/auth',
+  '/forgot-password',
+  '/verify-email',
+};
 const String _openLocationPrefix = '/legal/';
 
 String? resolveRedirect({

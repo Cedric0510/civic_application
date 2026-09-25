@@ -1,3 +1,4 @@
+import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 
 class SignUpUseCase {
@@ -5,7 +6,7 @@ class SignUpUseCase {
 
   final AuthRepository _repository;
 
-  Future<void> call({
+  Future<SignUpOutcome> call({
     required String email,
     required String password,
     required String communeSlug,
