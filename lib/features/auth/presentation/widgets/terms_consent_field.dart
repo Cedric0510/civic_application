@@ -16,17 +16,20 @@ class TermsConsentField extends FormField<bool> {
            return Column(
              crossAxisAlignment: CrossAxisAlignment.start,
              children: [
-               CheckboxListTile(
-                 contentPadding: EdgeInsets.zero,
-                 controlAffinity: ListTileControlAffinity.leading,
-                 value: state.value ?? false,
-                 onChanged: (value) {
-                   state.didChange(value ?? false);
-                   onChanged(value ?? false);
-                 },
-                 title: const Text(
-                   'J\'ai lu et j\'accepte les mentions légales et la '
-                   'politique de confidentialité.',
+               Material(
+                 type: MaterialType.transparency,
+                 child: CheckboxListTile(
+                   contentPadding: EdgeInsets.zero,
+                   controlAffinity: ListTileControlAffinity.leading,
+                   value: state.value ?? false,
+                   onChanged: (value) {
+                     state.didChange(value ?? false);
+                     onChanged(value ?? false);
+                   },
+                   title: const Text(
+                     'J\'ai lu et j\'accepte les mentions légales et la '
+                     'politique de confidentialité.',
+                   ),
                  ),
                ),
                Wrap(
