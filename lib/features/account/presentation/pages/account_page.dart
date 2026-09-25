@@ -59,6 +59,7 @@ class AccountPage extends ConsumerWidget {
         onRefresh: () async {
           ref.invalidate(userProfileProvider);
           ref.invalidate(userAppointmentsProvider);
+          await ref.read(authStateProvider.notifier).refreshQuietly();
         },
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

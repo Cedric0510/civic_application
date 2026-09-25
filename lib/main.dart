@@ -3,6 +3,7 @@ import 'package:civic_app/core/routing/app_router.dart';
 import 'package:civic_app/core/theme/app_theme.dart';
 import 'package:civic_app/features/accessibility/presentation/comfort_text_scale.dart';
 import 'package:civic_app/features/accessibility/presentation/controllers/display_settings_controller.dart';
+import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/settings/presentation/controllers/settings_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -30,7 +31,10 @@ class CivicApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
     final comfort = ref.watch(displaySettingsProvider).comfortMode;
     return AppResumeObserver(
-      onResume: () => ref.invalidate(citySettingsProvider),
+      onResume: () {
+        ref.invalidate(citySettingsProvider);
+        ref.read(authStateProvider.notifier).refreshQuietly();
+      },
       child: MaterialApp.router(
         title: 'City-Co',
         theme: comfort ? AppTheme.comfort : AppTheme.light,

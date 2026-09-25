@@ -82,6 +82,11 @@ class AuthApiDatasource {
     }
   }
 
+  Future<CitizenSession> fetchLiveSession() async {
+    final json = await _api.get('/citizens/me') as Map<String, dynamic>;
+    return _sessionFromJson(json);
+  }
+
   Future<CitizenSession> changeCommune(String communeSlug) async {
     final json =
         await _api.patch('/citizens/me/commune', {'communeSlug': communeSlug})

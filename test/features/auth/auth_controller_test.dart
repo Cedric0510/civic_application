@@ -1,3 +1,4 @@
+import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
@@ -96,7 +97,15 @@ class _FakeAuthDatasource extends AuthApiDatasource {
       );
 
   CitizenSession? session;
+  CitizenSession? liveSession;
+  Object? liveError;
   int fetchSessionCalls = 0;
+
+  @override
+  Future<CitizenSession> fetchLiveSession() async {
+    if (liveError != null) throw liveError!;
+    return liveSession!;
+  }
 
   @override
   Future<CitizenSession?> fetchSession() async {
@@ -289,4 +298,66 @@ void main() {
       expect(datasource.fetchSessionCalls, greaterThan(before));
     },
   );
+
+  group('refreshQuietly', () {
+    const commerce = ManagedCommerceRef(id: 'shop-1', name: 'Boulangerie');
+    final promoted = CitizenSession(
+      commune: _testCommune,
+      role: CitizenRole.commercant,
+      managedCommerce: commerce,
+    );
+
+    Future<void> signedIn() async {
+      fakeDatasource.session = _testSession;
+      await container.read(authStateProvider.notifier).refresh();
+    }
+
+    test(
+      'picks up a role granted by the town hall, without ever showing a loading state',
+      () async {
+        await signedIn();
+        fakeDatasource.liveSession = promoted;
+        final seen = <AsyncValue<CitizenSession?>>[];
+        container.listen(authStateProvider, (_, next) => seen.add(next));
+
+        await container.read(authStateProvider.notifier).refreshQuietly();
+
+        expect(container.read(authStateProvider).value, promoted);
+        expect(container.read(authStateProvider).value!.isCommercant, isTrue);
+        expect(seen.any((state) => state.isLoading), isFalse);
+      },
+    );
+
+    test('keeps the current session when the phone is offline', () async {
+      await signedIn();
+      fakeDatasource.liveError = const NetworkException();
+
+      await container.read(authStateProvider.notifier).refreshQuietly();
+
+      expect(container.read(authStateProvider).value, _testSession);
+    });
+
+    test('does nothing while nobody is signed in', () async {
+      fakeDatasource.session = null;
+      await container.read(authStateProvider.notifier).refresh();
+      fakeDatasource.liveSession = promoted;
+
+      await container.read(authStateProvider.notifier).refreshQuietly();
+
+      expect(container.read(authStateProvider).value, isNull);
+    });
+
+    test(
+      'signs the person out when the server no longer accepts the session',
+      () async {
+        await signedIn();
+        fakeDatasource.liveError = const AuthException('Session expirée.');
+        fakeDatasource.session = null;
+
+        await container.read(authStateProvider.notifier).refreshQuietly();
+
+        expect(container.read(authStateProvider).value, isNull);
+      },
+    );
+  });
 }

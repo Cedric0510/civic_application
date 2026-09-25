@@ -1,3 +1,4 @@
+import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/core/providers/api_client_provider.dart';
 import 'package:civic_app/core/providers/token_storage_provider.dart';
 import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
@@ -66,6 +67,18 @@ class AuthStateNotifier extends StateNotifier<AsyncValue<CitizenSession?>> {
   }
 
   final AuthApiDatasource _datasource;
+
+  Future<void> refreshQuietly() async {
+    if (state.valueOrNull == null) return;
+    try {
+      final session = await _datasource.fetchLiveSession();
+      if (mounted && session != state.valueOrNull) state = AsyncData(session);
+    } on AuthException {
+      await refresh();
+    } catch (_) {
+      return;
+    }
+  }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
