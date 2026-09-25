@@ -13,14 +13,8 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
   final SignUpUseCase _signUp;
   final SignOutUseCase _signOut;
 
-  Future<void> signIn({required String email, required String password}) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => _signIn(email: email, password: password),
-    );
-    if (!state.hasError) {
-      await _ref.read(authStateProvider.notifier).refresh();
-    }
+  Future<void> signIn({required String email, required String password}) {
+    return _run(() => _signIn(email: email, password: password));
   }
 
   Future<void> signUp({
@@ -29,9 +23,8 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     required String communeSlug,
     required bool acceptedTerms,
     String? invitationCode,
-  }) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
+  }) {
+    return _run(
       () => _signUp(
         email: email,
         password: password,
@@ -40,16 +33,20 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
         invitationCode: invitationCode,
       ),
     );
-    if (!state.hasError) {
-      await _ref.read(authStateProvider.notifier).refresh();
-    }
   }
 
-  Future<void> signOut() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _signOut());
-    if (!state.hasError) {
-      await _ref.read(authStateProvider.notifier).refresh();
+  Future<void> signOut() => _run(() => _signOut());
+
+  Future<void> _run(Future<void> Function() action) async {
+    final keepAlive = _ref.keepAlive();
+    try {
+      state = const AsyncLoading();
+      state = await AsyncValue.guard(action);
+      if (!state.hasError) {
+        await _ref.read(authStateProvider.notifier).refresh();
+      }
+    } finally {
+      keepAlive.close();
     }
   }
 }

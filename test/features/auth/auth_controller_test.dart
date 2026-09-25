@@ -34,6 +34,7 @@ class _FakeAuthRepository implements AuthRepository {
   Object? signInError;
   Object? signUpError;
   Object? signOutError;
+  Duration? signOutDelay;
 
   @override
   Future<void> signIn({required String email, required String password}) async {
@@ -72,6 +73,7 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
+    if (signOutDelay != null) await Future<void>.delayed(signOutDelay!);
     signOutCalls++;
     if (signOutError != null) throw signOutError!;
   }
@@ -261,6 +263,30 @@ void main() {
       expect(fakeRepo.signOutCalls, 1);
       expect(container.read(authControllerProvider).hasError, isFalse);
       expect(fakeDatasource.fetchSessionCalls, greaterThan(callsBefore));
+    },
+  );
+
+  test(
+    'signOut finishes, and refreshes the session, even when nothing listens to the controller any more',
+    () async {
+      final quietRepo = _FakeAuthRepository()
+        ..signOutDelay = const Duration(milliseconds: 20);
+      final datasource = _FakeAuthDatasource(null);
+      final quiet = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(quietRepo),
+          authDatasourceProvider.overrideWithValue(datasource),
+        ],
+      );
+      addTearDown(quiet.dispose);
+      quiet.read(authStateProvider);
+      await pumpEventQueue();
+      final before = datasource.fetchSessionCalls;
+
+      await quiet.read(authControllerProvider.notifier).signOut();
+
+      expect(quietRepo.signOutCalls, 1);
+      expect(datasource.fetchSessionCalls, greaterThan(before));
     },
   );
 }
