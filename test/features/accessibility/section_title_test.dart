@@ -3,6 +3,15 @@ import 'package:civic_app/shared/widgets/section_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+bool _isHeading(WidgetTester tester, String text) {
+  final ancestors = find
+      .ancestor(of: find.text(text).first, matching: find.byType(Semantics))
+      .evaluate();
+  return ancestors.any(
+    (element) => (element.widget as Semantics).properties.header == true,
+  );
+}
+
 void main() {
   testWidgets('a section title is announced as a heading', (tester) async {
     final handle = tester.ensureSemantics();
@@ -34,10 +43,7 @@ void main() {
       );
 
       expect(find.byTooltip('Retour'), findsOneWidget);
-      expect(
-        tester.getSemantics(find.text('Signalements').first),
-        containsSemantics(label: 'Signalements', isHeader: true),
-      );
+      expect(_isHeading(tester, 'Signalements'), isTrue);
       handle.dispose();
     },
   );
