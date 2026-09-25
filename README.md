@@ -41,6 +41,14 @@ flutter run
 
 Tests : `flutter test` ; analyse : `dart analyze`.
 
+## Tester sur un téléphone
+
+1. Brancher le téléphone (débogage USB activé) ou l'associer en Wi-Fi, puis vérifier `flutter devices`.
+2. Dans `.env`, remplacer `API_BASE_URL` par l'adresse du PC sur le réseau local, par exemple `http://192.168.1.20:4000` (l'émulateur Android utilise `http://10.0.2.2:4000`).
+3. Autoriser le port 4000 dans le pare-feu Windows (réseau privé), lancer l'API, puis `flutter run`.
+
+Les versions debug et profile acceptent le HTTP en clair pour ce besoin ; la version release exige HTTPS.
+
 ## Architecture
 
 Une couche par feature (`lib/features/<feature>/`), dans l'esprit d'une architecture propre :

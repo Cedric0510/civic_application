@@ -4,4 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- HTTP en clair autorisé uniquement pour joindre civic_api sur le réseau local
+         pendant le développement ; la version release reste en HTTPS obligatoire. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>
