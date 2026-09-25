@@ -4,6 +4,7 @@ import 'package:civic_app/features/auth/presentation/controllers/auth_controller
 import 'package:civic_app/features/auth/presentation/widgets/commune_picker_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthPage extends ConsumerStatefulWidget {
   const AuthPage({super.key});
@@ -50,6 +51,16 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           .read(authControllerProvider.notifier)
           .signIn(email: email, password: password);
     }
+  }
+
+  void _openForgotPassword() {
+    final email = _emailController.text.trim();
+    context.go(
+      Uri(
+        path: '/forgot-password',
+        queryParameters: email.isEmpty ? null : {'email': email},
+      ).toString(),
+    );
   }
 
   // civic_api renvoie déjà des messages exploitables en français.
@@ -176,6 +187,16 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 return null;
                               },
                             ),
+                            if (!_isSignUp)
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: isLoading
+                                      ? null
+                                      : _openForgotPassword,
+                                  child: const Text('Mot de passe oublié ?'),
+                                ),
+                              ),
                             if (_isSignUp) ...[
                               const SizedBox(height: 16),
                               CommunePickerField(

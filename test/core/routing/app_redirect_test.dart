@@ -70,5 +70,10 @@ void main() {
     test('sends a signed-in citizen away from /auth', () {
       expect(redirect('/auth'), '/home');
     });
+
+    test('lets anyone open the forgotten-password page, signed in or not', () {
+      expect(redirect('/forgot-password', isAuthenticated: false), isNull);
+      expect(redirect('/forgot-password'), '/home');
+    });
   });
 }

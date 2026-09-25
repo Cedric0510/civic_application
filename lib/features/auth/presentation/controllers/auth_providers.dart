@@ -6,6 +6,8 @@ import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:civic_app/features/auth/domain/usecases/change_commune_usecase.dart';
+import 'package:civic_app/features/auth/domain/usecases/request_password_reset_usecase.dart';
+import 'package:civic_app/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:civic_app/features/auth/domain/usecases/sign_up_usecase.dart';
@@ -28,6 +30,15 @@ final signInUseCaseProvider = Provider<SignInUseCase>((ref) {
 
 final signUpUseCaseProvider = Provider<SignUpUseCase>((ref) {
   return SignUpUseCase(ref.watch(authRepositoryProvider));
+});
+
+final requestPasswordResetUseCaseProvider =
+    Provider<RequestPasswordResetUseCase>((ref) {
+      return RequestPasswordResetUseCase(ref.watch(authRepositoryProvider));
+    });
+
+final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>((ref) {
+  return ResetPasswordUseCase(ref.watch(authRepositoryProvider));
 });
 
 final signOutUseCaseProvider = Provider<SignOutUseCase>((ref) {

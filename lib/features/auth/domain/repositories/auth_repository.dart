@@ -8,6 +8,12 @@ abstract class AuthRepository {
     required String communeSlug,
     String? invitationCode,
   });
+  Future<void> requestPasswordReset({required String email});
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  });
   Future<void> signOut();
   Future<CitizenSession> changeCommune(String communeSlug);
 }

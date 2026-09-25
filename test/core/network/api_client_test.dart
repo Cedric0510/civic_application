@@ -145,6 +145,32 @@ void main() {
       );
     });
 
+    test(
+      '429 throws RateLimitException with a readable message, not the raw server one',
+      () async {
+        final client = ApiClient(
+          MockClient(
+            (request) async => http.Response(
+              jsonEncode({'message': 'ThrottlerException: Too Many Requests'}),
+              429,
+            ),
+          ),
+          _FakeTokenStorage(),
+        );
+
+        await expectLater(
+          client.post('/citizens/forgot-password', {'email': 'a@b.com'}),
+          throwsA(
+            isA<RateLimitException>().having(
+              (e) => e.message,
+              'message',
+              'Trop de tentatives. Réessayez dans une minute.',
+            ),
+          ),
+        );
+      },
+    );
+
     test('other non-2xx statuses throw DatabaseException', () async {
       final client = ApiClient(
         MockClient((request) async => http.Response('{}', 500)),

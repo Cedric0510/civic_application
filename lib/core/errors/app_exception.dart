@@ -24,3 +24,9 @@ class NotFoundException extends AppException {
     super.message = 'The requested resource was not found.',
   ]);
 }
+
+class RateLimitException extends AppException {
+  const RateLimitException([
+    super.message = 'Trop de tentatives. Réessayez dans une minute.',
+  ]);
+}

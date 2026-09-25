@@ -260,6 +260,79 @@ void main() {
     });
   });
 
+  group('AuthApiDatasource password reset', () {
+    test('asks for a code with the address only', () async {
+      final storage = _InMemoryTokenStorage();
+      late http.Request seen;
+      final datasource = AuthApiDatasource(
+        ApiClient(
+          MockClient((request) async {
+            seen = request;
+            return http.Response('', 204);
+          }),
+          storage,
+        ),
+        storage,
+      );
+
+      await datasource.requestPasswordReset(email: 'martine@example.fr');
+
+      expect(seen.method, 'POST');
+      expect(seen.url.path, '/citizens/forgot-password');
+      expect(jsonDecode(seen.body), {'email': 'martine@example.fr'});
+    });
+
+    test(
+      'sends the address, the code and the new password to reset it',
+      () async {
+        final storage = _InMemoryTokenStorage();
+        late http.Request seen;
+        final datasource = AuthApiDatasource(
+          ApiClient(
+            MockClient((request) async {
+              seen = request;
+              return http.Response('', 204);
+            }),
+            storage,
+          ),
+          storage,
+        );
+
+        await datasource.resetPassword(
+          email: 'martine@example.fr',
+          code: 'K7QM-2XPD',
+          newPassword: 'nouveau-mot-de-passe',
+        );
+
+        expect(seen.url.path, '/citizens/reset-password');
+        expect(jsonDecode(seen.body), {
+          'email': 'martine@example.fr',
+          'code': 'K7QM-2XPD',
+          'newPassword': 'nouveau-mot-de-passe',
+        });
+      },
+    );
+
+    test(
+      'does not touch the stored session: nobody is signed in by a reset',
+      () async {
+        final storage = _InMemoryTokenStorage(token: 'tok');
+        final datasource = AuthApiDatasource(
+          ApiClient(MockClient((_) async => http.Response('', 204)), storage),
+          storage,
+        );
+
+        await datasource.resetPassword(
+          email: 'martine@example.fr',
+          code: 'K7QM-2XPD',
+          newPassword: 'nouveau-mot-de-passe',
+        );
+
+        expect(await storage.read(), 'tok');
+      },
+    );
+  });
+
   group('AuthApiDatasource.changeCommune', () {
     test(
       'PATCHes the chosen slug, returns the new session and caches the new commune',

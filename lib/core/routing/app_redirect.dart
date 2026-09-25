@@ -16,15 +16,17 @@ AppModule? moduleForLocation(String location) {
   return segments.isEmpty ? null : _moduleByRootSegment[segments.first];
 }
 
+const Set<String> _publicLocations = {'/auth', '/forgot-password'};
+
 String? resolveRedirect({
   required bool isAuthenticated,
   required String location,
   required Set<AppModule> disabledModules,
 }) {
-  final isOnAuth = location == '/auth';
-  // Toute l'app exige un compte : /auth est la seule route publique.
-  if (!isAuthenticated && !isOnAuth) return '/auth';
-  if (isAuthenticated && isOnAuth) return '/home';
+  final isPublic = _publicLocations.contains(location);
+  // Toute l'app exige un compte : seules les pages d'accès sont publiques.
+  if (!isAuthenticated && !isPublic) return '/auth';
+  if (isAuthenticated && isPublic) return '/home';
   final module = moduleForLocation(location);
   if (module != null && disabledModules.contains(module)) return '/home';
   return null;

@@ -38,6 +38,16 @@ class _RecordingAuthRepository implements AuthRepository {
   }) async {}
 
   @override
+  Future<void> requestPasswordReset({required String email}) async {}
+
+  @override
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {}
+
+  @override
   Future<void> signOut() async {}
 
   @override

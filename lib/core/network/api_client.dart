@@ -109,6 +109,9 @@ class ApiClient {
     if (response.statusCode == 404) {
       throw NotFoundException(_extractMessage(response.body));
     }
+    if (response.statusCode == 429) {
+      throw const RateLimitException();
+    }
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw DatabaseException(_extractMessage(response.body));
     }

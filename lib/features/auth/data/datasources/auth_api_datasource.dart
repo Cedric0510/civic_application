@@ -34,6 +34,22 @@ class AuthApiDatasource {
     await _tokenStorage.save(token);
   }
 
+  Future<void> requestPasswordReset({required String email}) async {
+    await _api.post('/citizens/forgot-password', {'email': email});
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    await _api.post('/citizens/reset-password', {
+      'email': email,
+      'code': code,
+      'newPassword': newPassword,
+    });
+  }
+
   Future<void> signOut() => _tokenStorage.clear();
 
   // Session du citoyen (commune + rôle + commerce géré le cas échéant) si un
