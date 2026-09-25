@@ -12,4 +12,7 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<void> deleteAccount() => _datasource.deleteAccount();
+
+  @override
+  Future<void> requestDataExport() => _datasource.requestDataExport();
 }

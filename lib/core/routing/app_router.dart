@@ -8,6 +8,9 @@ import 'package:civic_app/features/auth/presentation/controllers/auth_providers.
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:civic_app/features/commerces/presentation/pages/commerces_page.dart';
+import 'package:civic_app/features/feedback/presentation/pages/feedback_page.dart';
+import 'package:civic_app/features/legal/domain/entities/legal_texts.dart';
+import 'package:civic_app/features/legal/presentation/pages/legal_page.dart';
 import 'package:civic_app/features/commerces/presentation/pages/my_commerce_page.dart';
 import 'package:civic_app/features/home/presentation/pages/home_page.dart';
 import 'package:civic_app/features/polls/presentation/pages/polls_page.dart';
@@ -53,6 +56,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+      GoRoute(
+        path: '/feedback',
+        builder: (context, state) => const FeedbackPage(),
+      ),
+      GoRoute(
+        path: '/legal/:kind',
+        redirect: (context, state) =>
+            LegalDocument.fromRouteSegment(state.pathParameters['kind']!) ==
+                null
+            ? '/home'
+            : null,
+        builder: (context, state) => LegalPage(
+          document: LegalDocument.fromRouteSegment(
+            state.pathParameters['kind']!,
+          )!,
+          communeSlug: state.uri.queryParameters['commune'],
+        ),
+      ),
       GoRoute(
         path: '/articles',
         builder: (context, state) => const ArticlesPage(),

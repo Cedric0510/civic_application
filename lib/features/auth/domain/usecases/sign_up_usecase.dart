@@ -9,11 +9,13 @@ class SignUpUseCase {
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   }) => _repository.signUp(
     email: email,
     password: password,
     communeSlug: communeSlug,
+    acceptedTerms: acceptedTerms,
     invitationCode: invitationCode,
   );
 }

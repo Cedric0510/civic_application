@@ -27,6 +27,7 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   }) async {
     state = const AsyncLoading();
@@ -35,6 +36,7 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
         email: email,
         password: password,
         communeSlug: communeSlug,
+        acceptedTerms: acceptedTerms,
         invitationCode: invitationCode,
       ),
     );

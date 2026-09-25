@@ -238,6 +238,7 @@ void main() {
         email: 'martine@boulangerie.fr',
         password: 'secret123',
         communeSlug: 'bessan',
+        acceptedTerms: true,
         invitationCode: invitationCode,
       );
       expect(await storage.read(), 'tok');
@@ -249,6 +250,12 @@ void main() {
 
       expect(body['invitationCode'], 'K7QM-2XPD');
       expect(body['communeSlug'], 'bessan');
+    });
+
+    test('always tells the server the terms were accepted', () async {
+      final body = await bodySentBy();
+
+      expect(body['acceptTerms'], isTrue);
     });
 
     test('leaves the field out when the code is missing or blank', () async {

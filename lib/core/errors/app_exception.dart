@@ -27,6 +27,7 @@ class NotFoundException extends AppException {
 
 class RateLimitException extends AppException {
   const RateLimitException([
-    super.message = 'Trop de tentatives. Réessayez dans une minute.',
+    super.message =
+        'Trop de tentatives. Patientez un moment avant de réessayer.',
   ]);
 }

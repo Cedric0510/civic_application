@@ -71,6 +71,11 @@ void main() {
       expect(redirect('/auth'), '/home');
     });
 
+    test('lets anyone read the legal texts, even before signing up', () {
+      expect(redirect('/legal/privacy', isAuthenticated: false), isNull);
+      expect(redirect('/legal/notice'), isNull);
+    });
+
     test('lets anyone open the forgotten-password page, signed in or not', () {
       expect(redirect('/forgot-password', isAuthenticated: false), isNull);
       expect(redirect('/forgot-password'), '/home');

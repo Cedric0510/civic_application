@@ -2,6 +2,7 @@ import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_controller.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
 import 'package:civic_app/features/account/presentation/widgets/account_appointment_card.dart';
+import 'package:civic_app/features/account/presentation/widgets/account_privacy_section.dart';
 import 'package:civic_app/features/account/presentation/widgets/change_commune_dialog.dart';
 import 'package:civic_app/features/auth/domain/entities/citizen_session.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
@@ -109,6 +110,10 @@ class AccountPage extends ConsumerWidget {
                       _CommerceSection(
                         commerceName: session!.managedCommerce!.name,
                       ),
+                    ],
+                    if (session != null) ...[
+                      const SizedBox(height: 24),
+                      AccountPrivacySection(communeSlug: session.commune.slug),
                     ],
                     const SizedBox(height: 24),
                     _DangerSection(

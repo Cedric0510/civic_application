@@ -6,6 +6,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   });
   Future<void> requestPasswordReset({required String email});

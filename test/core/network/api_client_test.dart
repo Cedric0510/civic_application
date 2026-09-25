@@ -164,7 +164,7 @@ void main() {
             isA<RateLimitException>().having(
               (e) => e.message,
               'message',
-              'Trop de tentatives. Réessayez dans une minute.',
+              'Trop de tentatives. Patientez un moment avant de réessayer.',
             ),
           ),
         );

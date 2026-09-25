@@ -11,6 +11,8 @@ Application Flutter des citoyens d'une commune française. Elle se connecte à `
 - **Rendez-vous** : choix d'un service, puis d'un jour et d'une heure parmi les créneaux réellement libres des agents.
 - **Signalements** : adresse, catégorie, description et photo ; le signalement est rattaché au compte de son auteur.
 - **Commerçant** : un compte associé à un commerce en gère lui-même la fiche (horaires, photos, notes).
+- **Avis** : depuis l'accueil ou « Mon compte », une note de 1 à 5, un type (problème, idée, autre) et un message, lus par la mairie et par l'équipe City-Co. L'adresse e-mail n'est visible que si l'habitant l'autorise.
+- **Données et textes légaux** : « Mon compte » permet de recevoir ses données par e-mail (fichier JSON) et de lire les mentions légales et la politique de confidentialité de sa commune, éditables par la mairie. L'inscription demande de les accepter ; les textes sont lisibles avant de créer le compte, une fois la commune choisie.
 
 ## Démarrage local
 

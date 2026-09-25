@@ -29,6 +29,7 @@ class _FakeAuthRepository implements AuthRepository {
   String? lastPassword;
   String? lastCommuneSlug;
   String? lastInvitationCode;
+  bool? lastAcceptedTerms;
 
   Object? signInError;
   Object? signUpError;
@@ -47,6 +48,7 @@ class _FakeAuthRepository implements AuthRepository {
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   }) async {
     signUpCalls++;
@@ -54,6 +56,7 @@ class _FakeAuthRepository implements AuthRepository {
     lastPassword = password;
     lastCommuneSlug = communeSlug;
     lastInvitationCode = invitationCode;
+    lastAcceptedTerms = acceptedTerms;
     if (signUpError != null) throw signUpError!;
   }
 
@@ -178,6 +181,7 @@ void main() {
             email: 'new@b.com',
             password: 'secret123',
             communeSlug: 'bessan',
+            acceptedTerms: true,
           );
 
       expect(fakeRepo.signUpCalls, 1);
@@ -194,10 +198,24 @@ void main() {
           email: 'martine@boulangerie.fr',
           password: 'secret123',
           communeSlug: 'bessan',
+          acceptedTerms: true,
           invitationCode: 'K7QM-2XPD',
         );
 
     expect(fakeRepo.lastInvitationCode, 'K7QM-2XPD');
+  });
+
+  test('signUp forwards the consent given on the form', () async {
+    await container
+        .read(authControllerProvider.notifier)
+        .signUp(
+          email: 'new@b.com',
+          password: 'secret123',
+          communeSlug: 'bessan',
+          acceptedTerms: true,
+        );
+
+    expect(fakeRepo.lastAcceptedTerms, isTrue);
   });
 
   test('signUp sends no invitation code by default', () async {
@@ -207,6 +225,7 @@ void main() {
           email: 'new@b.com',
           password: 'secret123',
           communeSlug: 'bessan',
+          acceptedTerms: true,
         );
 
     expect(fakeRepo.lastInvitationCode, isNull);
@@ -224,6 +243,7 @@ void main() {
             email: 'dup@b.com',
             password: 'secret123',
             communeSlug: 'bessan',
+            acceptedTerms: true,
           );
 
       expect(container.read(authControllerProvider).hasError, isTrue);

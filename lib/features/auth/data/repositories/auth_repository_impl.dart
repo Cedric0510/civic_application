@@ -16,11 +16,13 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   }) => _datasource.signUp(
     email: email,
     password: password,
     communeSlug: communeSlug,
+    acceptedTerms: acceptedTerms,
     invitationCode: invitationCode,
   );
 

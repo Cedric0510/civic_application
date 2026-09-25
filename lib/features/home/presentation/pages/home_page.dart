@@ -1,4 +1,5 @@
 import 'package:civic_app/features/home/presentation/widgets/articles_carousel.dart';
+import 'package:civic_app/features/home/presentation/widgets/feedback_prompt_card.dart';
 import 'package:civic_app/features/home/presentation/widgets/navigation_tiles_grid.dart';
 import 'package:civic_app/features/home/presentation/widgets/village_name_widget.dart';
 import 'package:civic_app/features/home/presentation/widgets/weather_section.dart';
@@ -48,6 +49,8 @@ class HomePage extends StatelessWidget {
                     module: AppModule.weather,
                     child: WeatherSection(),
                   ),
+                  const SizedBox(height: 16),
+                  const FeedbackPromptCard(),
                   const SizedBox(height: 24),
                 ],
               ),

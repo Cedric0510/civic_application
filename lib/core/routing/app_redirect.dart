@@ -16,17 +16,20 @@ AppModule? moduleForLocation(String location) {
   return segments.isEmpty ? null : _moduleByRootSegment[segments.first];
 }
 
-const Set<String> _publicLocations = {'/auth', '/forgot-password'};
+const Set<String> _guestOnlyLocations = {'/auth', '/forgot-password'};
+const String _openLocationPrefix = '/legal/';
 
 String? resolveRedirect({
   required bool isAuthenticated,
   required String location,
   required Set<AppModule> disabledModules,
 }) {
-  final isPublic = _publicLocations.contains(location);
-  // Toute l'app exige un compte : seules les pages d'accès sont publiques.
-  if (!isAuthenticated && !isPublic) return '/auth';
-  if (isAuthenticated && isPublic) return '/home';
+  final isGuestOnly = _guestOnlyLocations.contains(location);
+  final isOpen = location.startsWith(_openLocationPrefix);
+  // Toute l'app exige un compte : seules les pages d'accès et les textes
+  // légaux (à lire avant l'inscription) sont ouverts à un visiteur.
+  if (!isAuthenticated && !isGuestOnly && !isOpen) return '/auth';
+  if (isAuthenticated && isGuestOnly) return '/home';
   final module = moduleForLocation(location);
   if (module != null && disabledModules.contains(module)) return '/home';
   return null;

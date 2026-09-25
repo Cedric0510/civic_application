@@ -47,6 +47,7 @@ class _ResetRepository implements AuthRepository {
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   }) async {}
 

@@ -22,6 +22,7 @@ class AuthApiDatasource {
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   }) async {
     final code = invitationCode?.trim();
@@ -29,6 +30,7 @@ class AuthApiDatasource {
       'email': email,
       'password': password,
       'communeSlug': communeSlug,
+      'acceptTerms': acceptedTerms,
       if (code != null && code.isNotEmpty) 'invitationCode': code,
     });
     await _tokenStorage.save(token);

@@ -2,6 +2,8 @@ import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:civic_app/features/auth/presentation/widgets/commune_picker_field.dart';
+import 'package:civic_app/features/auth/presentation/widgets/terms_consent_field.dart';
+import 'package:civic_app/features/legal/domain/entities/legal_texts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +22,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   final _invitationCodeController = TextEditingController();
   bool _isSignUp = false;
   bool _hasInvitationCode = false;
+  bool _acceptedTerms = false;
   bool _obscurePassword = true;
   CommuneRef? _selectedCommune;
 
@@ -42,6 +45,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
             email: email,
             password: password,
             communeSlug: _selectedCommune!.slug,
+            acceptedTerms: _acceptedTerms,
             invitationCode: _hasInvitationCode
                 ? _invitationCodeController.text
                 : null,
@@ -51,6 +55,26 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           .read(authControllerProvider.notifier)
           .signIn(email: email, password: password);
     }
+  }
+
+  void _openLegalDocument(LegalDocument document) {
+    final commune = _selectedCommune;
+    if (commune == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Choisissez d\'abord votre commune pour lire ce texte.',
+          ),
+        ),
+      );
+      return;
+    }
+    context.push(
+      Uri(
+        path: '/legal/${document.routeSegment}',
+        queryParameters: {'commune': commune.slug},
+      ).toString(),
+    );
   }
 
   void _openForgotPassword() {
@@ -244,6 +268,15 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                         : 'J\'ai un code d\'invitation commerçant',
                                   ),
                                 ),
+                              ),
+                            ],
+                            if (_isSignUp) ...[
+                              const SizedBox(height: 8),
+                              TermsConsentField(
+                                accepted: _acceptedTerms,
+                                onChanged: (value) =>
+                                    setState(() => _acceptedTerms = value),
+                                onOpenDocument: _openLegalDocument,
                               ),
                             ],
                             const SizedBox(height: 28),

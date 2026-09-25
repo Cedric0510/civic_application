@@ -18,17 +18,20 @@ class _RecordingAuthRepository implements AuthRepository {
   int signUpCalls = 0;
   String? lastCommuneSlug;
   String? lastInvitationCode;
+  bool? lastAcceptedTerms;
 
   @override
   Future<void> signUp({
     required String email,
     required String password,
     required String communeSlug,
+    required bool acceptedTerms,
     String? invitationCode,
   }) async {
     signUpCalls++;
     lastCommuneSlug = communeSlug;
     lastInvitationCode = invitationCode;
+    lastAcceptedTerms = acceptedTerms;
   }
 
   @override
@@ -103,6 +106,8 @@ Future<void> _fillIdentity(WidgetTester tester) async {
   await tester.tap(find.byType(DropdownButtonFormField<CommuneRef>));
   await tester.pumpAndSettle();
   await tester.tap(find.text('Bessan').last);
+  await tester.pumpAndSettle();
+  await tester.tap(find.byType(CheckboxListTile));
   await tester.pumpAndSettle();
 }
 
@@ -186,5 +191,47 @@ void main() {
 
     expect(repository.signUpCalls, 1);
     expect(repository.lastInvitationCode, isNull);
+  });
+
+  testWidgets('does not create the account until the terms are accepted', (
+    tester,
+  ) async {
+    final repository = await _openSignUp(tester);
+    await _fillIdentity(tester);
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.pumpAndSettle();
+
+    await _submit(tester);
+
+    expect(
+      find.text('Vous devez accepter pour créer un compte.'),
+      findsOneWidget,
+    );
+    expect(repository.signUpCalls, 0);
+  });
+
+  testWidgets('sends the acceptance of the terms with the sign-up', (
+    tester,
+  ) async {
+    final repository = await _openSignUp(tester);
+    await _fillIdentity(tester);
+
+    await _submit(tester);
+
+    expect(repository.lastAcceptedTerms, isTrue);
+  });
+
+  testWidgets('asks to choose the commune before reading a legal text', (
+    tester,
+  ) async {
+    await _openSignUp(tester);
+
+    await tester.tap(find.text('Lire : Mentions légales'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Choisissez d\'abord votre commune pour lire ce texte.'),
+      findsOneWidget,
+    );
   });
 }

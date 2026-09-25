@@ -5,6 +5,7 @@ import 'package:civic_app/features/account/domain/entities/user_profile.dart';
 import 'package:civic_app/features/account/domain/repositories/account_repository.dart';
 import 'package:civic_app/features/account/domain/usecases/delete_account_usecase.dart';
 import 'package:civic_app/features/account/domain/usecases/get_user_profile_usecase.dart';
+import 'package:civic_app/features/account/domain/usecases/request_data_export_usecase.dart';
 import 'package:civic_app/features/appointments/domain/entities/appointment.dart';
 import 'package:civic_app/features/appointments/presentation/controllers/appointment_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,12 +26,18 @@ final deleteAccountUseCaseProvider = Provider<DeleteAccountUseCase>((ref) {
   return DeleteAccountUseCase(ref.watch(accountRepositoryProvider));
 });
 
+final requestDataExportUseCaseProvider = Provider<RequestDataExportUseCase>((
+  ref,
+) {
+  return RequestDataExportUseCase(ref.watch(accountRepositoryProvider));
+});
+
 final userProfileProvider = FutureProvider.autoDispose<UserProfile?>((ref) {
   return ref.watch(getUserProfileUseCaseProvider).call();
 });
 
-final userAppointmentsProvider = FutureProvider.autoDispose<List<Appointment>>(
-  (ref) {
-    return ref.watch(getMyAppointmentsUseCaseProvider).call();
-  },
-);
+final userAppointmentsProvider = FutureProvider.autoDispose<List<Appointment>>((
+  ref,
+) {
+  return ref.watch(getMyAppointmentsUseCaseProvider).call();
+});

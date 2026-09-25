@@ -21,6 +21,10 @@ class AccountApiDatasource {
     }
   }
 
+  Future<void> requestDataExport() async {
+    await _api.post('/citizens/me/export/email');
+  }
+
   // Ne gère pas la déconnexion locale (token) : c'est la responsabilité du
   // contrôleur, via le SignOutUseCase de la feature auth — une seule source
   // de vérité pour "effacer la session".
