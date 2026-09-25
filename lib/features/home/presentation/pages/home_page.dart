@@ -1,3 +1,4 @@
+import 'package:civic_app/features/accessibility/presentation/widgets/comfort_mode_button.dart';
 import 'package:civic_app/features/home/presentation/widgets/articles_carousel.dart';
 import 'package:civic_app/features/home/presentation/widgets/feedback_prompt_card.dart';
 import 'package:civic_app/features/home/presentation/widgets/navigation_tiles_grid.dart';
@@ -18,6 +19,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('City-Co'),
         actions: [
+          const ComfortModeButton(),
           Consumer(
             builder: (context, ref, _) => IconButton(
               icon: const Icon(Icons.account_circle_outlined),

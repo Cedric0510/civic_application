@@ -1,15 +1,15 @@
+import 'package:civic_app/shared/widgets/section_title.dart';
+import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/reports/presentation/controllers/my_reports_controller.dart';
 import 'package:civic_app/features/reports/presentation/widgets/report_card.dart';
 import 'package:civic_app/features/reports/presentation/widgets/report_form.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class ReportsPage extends ConsumerWidget {
   const ReportsPage({super.key});
-
-  static const Color _headerColor = Color(0xFF6D4C41);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,50 +21,29 @@ class ReportsPage extends ConsumerWidget {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              expandedHeight: 80,
-              pinned: true,
-              backgroundColor: _headerColor,
-              foregroundColor: Colors.white,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.go('/home'),
-              ),
-              flexibleSpace: const FlexibleSpaceBar(
-                title: Text(
-                  'Signalements',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-                titlePadding: EdgeInsets.only(left: 56, bottom: 12),
-                background: ColoredBox(color: _headerColor),
-              ),
+            FeatureAppBar(
+              title: 'Signalements',
+              color: FeatureColors.reports,
+              backPath: '/home',
             ),
             const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: ReportForm(),
-              ),
+              child: Padding(padding: EdgeInsets.all(20), child: ReportForm()),
             ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                child: Text(
-                  'Mes signalements',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: SectionTitle('Mes signalements'),
               ),
             ),
             myReportsAsync.when(
               loading: () => const SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.all(24),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      semanticsLabel: 'Chargement en cours',
+                    ),
+                  ),
                 ),
               ),
               error: (error, stackTrace) => SliverToBoxAdapter(

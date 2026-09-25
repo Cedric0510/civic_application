@@ -14,6 +14,15 @@ Application Flutter des citoyens d'une commune française. Elle se connecte à `
 - **Avis** : depuis l'accueil ou « Mon compte », une note de 1 à 5, un type (problème, idée, autre) et un message, lus par la mairie et par l'équipe City-Co. L'adresse e-mail n'est visible que si l'habitant l'autorise.
 - **Données et textes légaux** : « Mon compte » permet de recevoir ses données par e-mail (fichier JSON) et de lire les mentions légales et la politique de confidentialité de sa commune, éditables par la mairie. L'inscription demande de les accepter ; les textes sont lisibles avant de créer le compte, une fois la commune choisie.
 
+## Accessibilité
+
+- **Mode Confort** : un interrupteur sur la page de connexion, dans « Mon compte » et un bouton sur l'accueil. Il agrandit tous les textes d'au moins 30 % (en s'ajoutant au réglage du téléphone, plafonné à 200 %), renforce les contrastes (niveau AAA), épaissit les bordures des champs, agrandit les boutons (60 px de haut) et passe les tuiles de l'accueil sur une colonne. Le choix est mémorisé. Le nom et sa description sont définis à un seul endroit (`display_settings.dart`).
+- **Réglage du téléphone respecté** : sans Mode Confort, la taille de texte du système s'applique ; à partir de 130 %, les tuiles de l'accueil passent aussi sur une colonne.
+- **Lecteurs d'écran** : titres de page et de section déclarés comme titres, boutons icônes nommés (retour, afficher le mot de passe, retirer la photo), notes en étoiles annoncées « 4 étoiles sur 5 », images décoratives ignorées, indicateurs de chargement nommés, interface en français (`Locale('fr')`).
+- **Contraste** : les couleurs des rubriques (`FeatureColors`) portent du texte blanc à 4,5:1 au moins ; un test le garantit.
+- **Mouvement** : les animations du carrousel se coupent quand le système demande de réduire les animations.
+- Des tests parcourent les pages principales à 100 % et 200 % de taille de texte, en affichage normal et en Mode Confort : aucun débordement, chaque commande nommée et d'au moins 48 px.
+
 ## Démarrage local
 
 `civic_api` doit tourner (voir son README).

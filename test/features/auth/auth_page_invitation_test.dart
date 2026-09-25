@@ -6,6 +6,7 @@ import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
+import '../../support/preferences_override.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -84,6 +85,7 @@ Future<_RecordingAuthRepository> _openSignUp(WidgetTester tester) async {
         authRepositoryProvider.overrideWithValue(repository),
         authDatasourceProvider.overrideWithValue(_SignedOutDatasource()),
         publicCommunesProvider.overrideWith((ref) async => [_bessan]),
+        await preferencesOverride(),
       ],
       child: const MaterialApp(home: AuthPage()),
     ),

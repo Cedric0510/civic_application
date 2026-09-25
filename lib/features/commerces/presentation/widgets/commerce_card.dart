@@ -25,6 +25,7 @@ class CommerceCard extends StatelessWidget {
           if (commerce.imageUrl != null)
             Image.network(
               commerce.imageUrl!,
+              excludeFromSemantics: true,
               width: double.infinity,
               height: 140,
               fit: BoxFit.cover,

@@ -78,6 +78,7 @@ class _CarouselItem extends StatelessWidget {
             children: [
               if (article.imageUrl != null)
                 Image.network(
+                  excludeFromSemantics: true,
                   article.imageUrl!,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>
@@ -128,7 +129,9 @@ class _DotIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 250),
       margin: const EdgeInsets.symmetric(horizontal: 4),
       width: isActive ? 20 : 8,
       height: 8,
@@ -154,7 +157,11 @@ class _CarouselSkeleton extends StatelessWidget {
         child: Container(
           height: 220,
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: const Center(child: CircularProgressIndicator()),
+          child: const Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: 'Chargement en cours',
+            ),
+          ),
         ),
       ),
     );

@@ -36,7 +36,9 @@ class _WeatherTileSkeleton extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Center(child: CircularProgressIndicator()),
+      child: const Center(
+        child: CircularProgressIndicator(semanticsLabel: 'Chargement en cours'),
+      ),
     );
   }
 }

@@ -53,7 +53,10 @@ class CommunePickerField extends ConsumerWidget {
             child: SizedBox(
               height: 20,
               width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Chargement en cours',
+                strokeWidth: 2,
+              ),
             ),
           ),
           error: (error, stackTrace) => const InputDecorator(

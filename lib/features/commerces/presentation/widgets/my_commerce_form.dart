@@ -18,7 +18,9 @@ class MyCommerceForm extends ConsumerStatefulWidget {
 
 class _MyCommerceFormState extends ConsumerState<MyCommerceForm> {
   final _formKey = GlobalKey<FormState>();
-  late final _nameController = TextEditingController(text: widget.commerce.name);
+  late final _nameController = TextEditingController(
+    text: widget.commerce.name,
+  );
   late final _categoryController = TextEditingController(
     text: widget.commerce.category ?? '',
   );
@@ -213,7 +215,10 @@ class _MyCommerceFormState extends ConsumerState<MyCommerceForm> {
                 ? const SizedBox(
                     height: 20,
                     width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      semanticsLabel: 'Chargement en cours',
+                      strokeWidth: 2,
+                    ),
                   )
                 : const Text('Enregistrer'),
           ),

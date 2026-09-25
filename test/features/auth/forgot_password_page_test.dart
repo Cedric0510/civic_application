@@ -7,6 +7,7 @@ import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:civic_app/features/auth/presentation/pages/forgot_password_page.dart';
+import '../../support/preferences_override.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -100,6 +101,7 @@ Future<_ResetRepository> _open(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
         authDatasourceProvider.overrideWithValue(_SignedOutDatasource()),
+        await preferencesOverride(),
       ],
       child: MaterialApp.router(routerConfig: router),
     ),

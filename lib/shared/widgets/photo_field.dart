@@ -66,6 +66,7 @@ class PhotoField extends StatelessWidget {
                 child: photo != null
                     ? _PickedPhotoPreview(photo: photo!)
                     : Image.network(
+                        semanticLabel: 'Aperçu de la photo choisie',
                         existingImageUrl!,
                         height: 160,
                         width: double.infinity,
@@ -84,6 +85,7 @@ class PhotoField extends StatelessWidget {
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       iconSize: 16,
+                      tooltip: 'Retirer la photo',
                       icon: const Icon(Icons.close, color: Colors.white),
                       onPressed: () => onChanged(null),
                     ),
@@ -157,7 +159,11 @@ class _PickedPhotoPreviewState extends State<_PickedPhotoPreview> {
         if (!snapshot.hasData) {
           return const SizedBox(
             height: 160,
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Chargement en cours',
+              ),
+            ),
           );
         }
         return Image.memory(

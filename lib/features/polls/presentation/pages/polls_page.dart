@@ -1,16 +1,15 @@
+import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/polls/presentation/controllers/polls_controller.dart';
 import 'package:civic_app/features/polls/presentation/controllers/polls_providers.dart';
 import 'package:civic_app/features/polls/presentation/widgets/poll_card.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class PollsPage extends ConsumerWidget {
   const PollsPage({super.key});
-
-  static const Color _headerColor = Color(0xFF43A047);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,27 +22,10 @@ class PollsPage extends ConsumerWidget {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              expandedHeight: 80,
-              pinned: true,
-              backgroundColor: _headerColor,
-              foregroundColor: Colors.white,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.go('/home'),
-              ),
-              flexibleSpace: const FlexibleSpaceBar(
-                title: Text(
-                  'Sondages',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-                titlePadding: EdgeInsets.only(left: 56, bottom: 12),
-                background: ColoredBox(color: _headerColor),
-              ),
+            FeatureAppBar(
+              title: 'Sondages',
+              color: FeatureColors.polls,
+              backPath: '/home',
             ),
             if (waitingUntil != null)
               SliverToBoxAdapter(
@@ -51,7 +33,11 @@ class PollsPage extends ConsumerWidget {
               ),
             state.when(
               loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: 'Chargement en cours',
+                  ),
+                ),
               ),
               error: (error, stackTrace) => SliverFillRemaining(
                 child: ErrorRetryWidget(

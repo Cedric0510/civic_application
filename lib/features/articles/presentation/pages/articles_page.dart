@@ -1,3 +1,5 @@
+import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/articles/presentation/controllers/articles_controller.dart';
 import 'package:civic_app/features/articles/presentation/widgets/article_card.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
@@ -13,8 +15,6 @@ class ArticlesPage extends ConsumerStatefulWidget {
 }
 
 class _ArticlesPageState extends ConsumerState<ArticlesPage> {
-  static const Color _headerColor = Color(0xFF1E88E5);
-
   String? _selectedCategory;
 
   @override
@@ -27,31 +27,18 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              expandedHeight: 80,
-              pinned: true,
-              backgroundColor: _headerColor,
-              foregroundColor: Colors.white,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.go('/home'),
-              ),
-              flexibleSpace: const FlexibleSpaceBar(
-                title: Text(
-                  'Actualités',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-                titlePadding: EdgeInsets.only(left: 56, bottom: 12),
-                background: ColoredBox(color: _headerColor),
-              ),
+            FeatureAppBar(
+              title: 'Actualités',
+              color: FeatureColors.articles,
+              backPath: '/home',
             ),
             state.when(
               loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: 'Chargement en cours',
+                  ),
+                ),
               ),
               error: (error, stackTrace) => SliverFillRemaining(
                 child: ErrorRetryWidget(

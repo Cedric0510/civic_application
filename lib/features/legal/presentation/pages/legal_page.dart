@@ -39,8 +39,11 @@ class LegalPage extends ConsumerWidget {
             : ref
                   .watch(legalTextsProvider(slug))
                   .when(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(
+                        semanticsLabel: 'Chargement en cours',
+                      ),
+                    ),
                     error: (error, stackTrace) => Padding(
                       padding: const EdgeInsets.all(20),
                       child: ErrorRetryWidget(

@@ -223,6 +223,9 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               prefixIcon: const Icon(Icons.lock_outline),
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
+                tooltip: _obscurePassword
+                    ? 'Afficher le mot de passe'
+                    : 'Masquer le mot de passe',
                 icon: Icon(
                   _obscurePassword
                       ? Icons.visibility_off_outlined
@@ -292,7 +295,10 @@ class _ButtonSpinner extends StatelessWidget {
     return const SizedBox(
       height: 20,
       width: 20,
-      child: CircularProgressIndicator(strokeWidth: 2),
+      child: CircularProgressIndicator(
+        semanticsLabel: 'Chargement en cours',
+        strokeWidth: 2,
+      ),
     );
   }
 }

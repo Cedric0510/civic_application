@@ -26,7 +26,11 @@ class WeatherDetailPage extends ConsumerWidget {
 
     return state.when(
       loading: () => const _PlainScaffold(
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            semanticsLabel: 'Chargement en cours',
+          ),
+        ),
       ),
       error: (error, stackTrace) => _PlainScaffold(
         child: ErrorRetryWidget(
@@ -66,6 +70,7 @@ class _BackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
+      tooltip: 'Retour',
       onPressed: () => context.go('/home'),
     );
   }

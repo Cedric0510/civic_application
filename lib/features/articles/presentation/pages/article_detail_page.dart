@@ -1,15 +1,14 @@
+import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/articles/presentation/controllers/articles_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class ArticleDetailPage extends ConsumerWidget {
   const ArticleDetailPage({super.key, required this.articleId});
 
   final String articleId;
-
-  static const Color _headerColor = Color(0xFF1E88E5);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,7 +21,11 @@ class ArticleDetailPage extends ConsumerWidget {
           slivers: [
             _buildAppBar(context, null),
             const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: 'Chargement en cours',
+                ),
+              ),
             ),
           ],
         ),
@@ -71,17 +74,18 @@ class ArticleDetailPage extends ConsumerWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: _headerColor.withValues(alpha: 0.1),
+                              color: FeatureColors.articles.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               article.category!,
-                              style: Theme.of(
-                                context,
-                              ).textTheme.labelSmall?.copyWith(
-                                color: _headerColor,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: FeatureColors.articles,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
                         ],
@@ -106,52 +110,38 @@ class ArticleDetailPage extends ConsumerWidget {
     );
   }
 
-  SliverAppBar _buildAppBar(BuildContext context, String? imageUrl) {
-    return SliverAppBar(
+  Widget _buildAppBar(BuildContext context, String? imageUrl) {
+    return FeatureAppBar(
+      title: 'Article',
+      color: FeatureColors.articles,
+      backPath: '/articles',
       expandedHeight: imageUrl != null ? 240 : 80,
-      pinned: true,
-      backgroundColor: _headerColor,
-      foregroundColor: Colors.white,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => context.go('/articles'),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 56, bottom: 12),
-        title: const Text(
-          'Article',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 18,
-          ),
-        ),
-        background: imageUrl != null
-            ? Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const ColoredBox(color: _headerColor),
-                  ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.black.withValues(alpha: 0.5),
-                          Colors.transparent,
-                        ],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                      ),
+      background: imageUrl != null
+          ? Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.network(
+                  excludeFromSemantics: true,
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const ColoredBox(color: FeatureColors.articles),
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withValues(alpha: 0.5),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
                     ),
                   ),
-                ],
-              )
-            : const ColoredBox(color: _headerColor),
-      ),
+                ),
+              ],
+            )
+          : const ColoredBox(color: FeatureColors.articles),
     );
   }
 }

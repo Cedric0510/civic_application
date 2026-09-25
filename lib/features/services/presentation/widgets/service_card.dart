@@ -23,6 +23,7 @@ class ServiceCard extends StatelessWidget {
           if (service.imageUrl != null)
             Image.network(
               service.imageUrl!,
+              excludeFromSemantics: true,
               width: double.infinity,
               height: 140,
               fit: BoxFit.cover,

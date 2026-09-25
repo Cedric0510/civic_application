@@ -25,6 +25,7 @@ class ArticleCard extends StatelessWidget {
                 width: 110,
                 child: article.imageUrl != null
                     ? Image.network(
+                        excludeFromSemantics: true,
                         article.imageUrl!,
                         fit: BoxFit.cover,
                         height: double.infinity,
@@ -92,12 +93,11 @@ class ArticleCard extends StatelessWidget {
                                 child: Text(
                                   article.category!,
                                   overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.labelSmall?.copyWith(
-                                    color: colorScheme.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                 ),
                               ),
                             ),

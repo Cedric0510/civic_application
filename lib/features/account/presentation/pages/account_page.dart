@@ -1,4 +1,8 @@
+import 'package:civic_app/shared/widgets/section_title.dart';
+import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/core/errors/app_exception.dart';
+import 'package:civic_app/features/accessibility/presentation/widgets/comfort_mode_tile.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_controller.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_providers.dart';
 import 'package:civic_app/features/account/presentation/widgets/account_appointment_card.dart';
@@ -16,8 +20,6 @@ import 'package:go_router/go_router.dart';
 
 class AccountPage extends ConsumerWidget {
   const AccountPage({super.key});
-
-  static const Color _headerColor = Color(0xFF5E35B1);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -61,27 +63,10 @@ class AccountPage extends ConsumerWidget {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              expandedHeight: 80,
-              pinned: true,
-              backgroundColor: _headerColor,
-              foregroundColor: Colors.white,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.go('/home'),
-              ),
-              flexibleSpace: const FlexibleSpaceBar(
-                title: Text(
-                  'Mon compte',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-                titlePadding: EdgeInsets.only(left: 56, bottom: 12),
-                background: ColoredBox(color: _headerColor),
-              ),
+            FeatureAppBar(
+              title: 'Mon compte',
+              color: FeatureColors.account,
+              backPath: '/home',
             ),
             SliverToBoxAdapter(
               child: Padding(
@@ -111,6 +96,8 @@ class AccountPage extends ConsumerWidget {
                         commerceName: session!.managedCommerce!.name,
                       ),
                     ],
+                    const SizedBox(height: 24),
+                    const ComfortModeTile(),
                     if (session != null) ...[
                       const SizedBox(height: 24),
                       AccountPrivacySection(communeSlug: session.commune.slug),
@@ -257,12 +244,7 @@ class _CommuneSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Ma commune',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        SectionTitle('Ma commune'),
         const SizedBox(height: 10),
         Row(
           children: [
@@ -306,18 +288,15 @@ class _AppointmentsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Mes rendez-vous',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        SectionTitle('Mes rendez-vous'),
         const SizedBox(height: 10),
         appointmentsAsync.when(
           loading: () => const Center(
             child: Padding(
               padding: EdgeInsets.all(24),
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Chargement en cours',
+              ),
             ),
           ),
           error: (e, _) => ErrorRetryWidget(
@@ -379,12 +358,7 @@ class _CommerceSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Mon commerce',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        SectionTitle('Mon commerce'),
         const SizedBox(height: 10),
         InkWell(
           onTap: () => context.go('/my-commerce'),

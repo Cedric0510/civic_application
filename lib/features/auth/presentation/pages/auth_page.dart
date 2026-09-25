@@ -1,4 +1,5 @@
 import 'package:civic_app/core/errors/app_exception.dart';
+import 'package:civic_app/features/accessibility/presentation/widgets/comfort_mode_tile.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:civic_app/features/auth/presentation/widgets/commune_picker_field.dart';
@@ -121,7 +122,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const _AuthBrand(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  const ComfortModeTile(),
+                  const SizedBox(height: 16),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       color: colorScheme.surface,
@@ -190,6 +193,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 border: const OutlineInputBorder(),
                                 suffixIcon: IconButton(
+                                  tooltip: _obscurePassword
+                                      ? 'Afficher le mot de passe'
+                                      : 'Masquer le mot de passe',
                                   icon: Icon(
                                     _obscurePassword
                                         ? Icons.visibility_off_outlined
@@ -295,6 +301,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                       height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
+                                        semanticsLabel: 'Chargement en cours',
                                         strokeWidth: 2,
                                       ),
                                     )
@@ -371,7 +378,11 @@ class _AuthBrand extends StatelessWidget {
               borderRadius: BorderRadius.circular(18),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
-                child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.cover,
+                  semanticLabel: 'City-Co',
+                ),
               ),
             ),
           ),

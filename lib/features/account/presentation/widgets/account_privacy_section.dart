@@ -1,3 +1,4 @@
+import 'package:civic_app/shared/widgets/section_title.dart';
 import 'package:civic_app/features/account/presentation/controllers/account_controller.dart';
 import 'package:civic_app/features/legal/domain/entities/legal_texts.dart';
 import 'package:flutter/material.dart';
@@ -46,16 +47,10 @@ class AccountPrivacySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Mes données et informations',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        SectionTitle('Mes données et informations'),
         const SizedBox(height: 4),
         ListTile(
           contentPadding: EdgeInsets.zero,
