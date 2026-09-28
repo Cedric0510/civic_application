@@ -1,10 +1,15 @@
+import 'package:civic_app/core/auth/token_storage.dart';
+import 'package:civic_app/core/network/api_client.dart';
 import 'package:civic_app/features/account/presentation/widgets/change_commune_dialog.dart';
+import 'package:civic_app/features/auth/data/datasources/auth_api_datasource.dart';
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/widgets/unknown_commune_notice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 const _current = CommuneRef(
   id: 'c0',
@@ -19,7 +24,26 @@ const _villeneuve = CommuneRef(
   postalCode: '12260',
 );
 
+class _SpyAuthDatasource extends AuthApiDatasource {
+  _SpyAuthDatasource()
+    : super(
+        ApiClient(
+          MockClient((_) async => http.Response('{}', 200)),
+          TokenStorage(),
+        ),
+        TokenStorage(),
+      );
+
+  final List<String> reportedProspects = [];
+
+  @override
+  Future<void> recordCommuneProspect(String postalCode) async {
+    reportedProspects.add(postalCode);
+  }
+}
+
 CommuneRef? _result;
+_SpyAuthDatasource? _lastDatasource;
 
 Future<void> _open(
   WidgetTester tester, {
@@ -27,9 +51,12 @@ Future<void> _open(
   Object? communesError,
 }) async {
   _result = null;
+  final datasource = _SpyAuthDatasource();
+  _lastDatasource = datasource;
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        authDatasourceProvider.overrideWithValue(datasource),
         publicCommunesProvider.overrideWith((ref) async {
           if (communesError != null) throw communesError;
           return communes;
@@ -103,8 +130,20 @@ void main() {
         expect(find.byType(UnknownCommuneNotice), findsOneWidget);
         expect(_result, isNull);
         expect(find.byType(AlertDialog), findsOneWidget);
+        expect(_lastDatasource!.reportedProspects, ['99999']);
       },
     );
+
+    testWidgets('never reports a postal code that does match a commune', (
+      tester,
+    ) async {
+      await _open(tester);
+      await _typePostalCode(tester, '12260');
+
+      await _confirm(tester);
+
+      expect(_lastDatasource!.reportedProspects, isEmpty);
+    });
 
     testWidgets('refuses to "change" to the commune already in place', (
       tester,

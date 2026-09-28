@@ -162,6 +162,13 @@ class AuthApiDatasource {
         .toList();
   }
 
+  // Signal commercial (commune pas encore partenaire) : jamais bloquant pour
+  // la personne qui cherche sa commune, cf. PostalCodeCommuneLookup qui
+  // ignore l'échec de cet appel.
+  Future<void> recordCommuneProspect(String postalCode) async {
+    await _api.post('/communes/prospects', {'postalCode': postalCode});
+  }
+
   Future<String> _authenticate(String path, Map<String, dynamic> body) async {
     final json = await _api.post(path, body) as Map<String, dynamic>;
     return json['accessToken'] as String;

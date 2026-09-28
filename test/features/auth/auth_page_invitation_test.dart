@@ -95,7 +95,16 @@ class _SignedOutDatasource extends AuthApiDatasource {
 
   @override
   Future<CitizenSession?> fetchSession() async => null;
+
+  final List<String> reportedProspects = [];
+
+  @override
+  Future<void> recordCommuneProspect(String postalCode) async {
+    reportedProspects.add(postalCode);
+  }
 }
+
+_SignedOutDatasource? _lastDatasource;
 
 Future<_RecordingAuthRepository> _openSignUp(
   WidgetTester tester, {
@@ -107,11 +116,13 @@ Future<_RecordingAuthRepository> _openSignUp(
   addTearDown(tester.view.reset);
 
   final repository = _RecordingAuthRepository();
+  final datasource = _SignedOutDatasource();
+  _lastDatasource = datasource;
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
-        authDatasourceProvider.overrideWithValue(_SignedOutDatasource()),
+        authDatasourceProvider.overrideWithValue(datasource),
         publicCommunesProvider.overrideWith((ref) async {
           if (communesError != null) throw communesError;
           return communes;
@@ -426,8 +437,20 @@ void main() {
         );
         expect(find.textContaining(supportEmail), findsOneWidget);
         expect(repository.signUpCalls, 0);
+        expect(_lastDatasource!.reportedProspects, ['99999']);
       },
     );
+
+    testWidgets('never reports a postal code that does match a commune', (
+      tester,
+    ) async {
+      await _openSignUp(tester);
+      await _fillIdentity(tester, postalCode: '34550');
+
+      await _submit(tester);
+
+      expect(_lastDatasource!.reportedProspects, isEmpty);
+    });
 
     testWidgets('drops the notice as soon as the postal code is edited', (
       tester,

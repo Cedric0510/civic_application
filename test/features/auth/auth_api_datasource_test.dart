@@ -55,6 +55,23 @@ void main() {
     dotenv.testLoad(fileInput: 'API_BASE_URL=http://test.local');
   });
 
+  group('AuthApiDatasource.recordCommuneProspect', () {
+    test('reports the postal code, expecting no content back', () async {
+      String? path;
+      Map<String, dynamic>? sent;
+      final datasource = _datasource(_InMemoryTokenStorage(), (request) async {
+        path = request.url.path;
+        sent = jsonDecode(request.body) as Map<String, dynamic>;
+        return http.Response('', 204);
+      });
+
+      await datasource.recordCommuneProspect('99999');
+
+      expect(path, '/communes/prospects');
+      expect(sent, {'postalCode': '99999'});
+    });
+  });
+
   group('AuthApiDatasource sign-up verification', () {
     test(
       'a sign-up that needs a code stores no token and reports the times',

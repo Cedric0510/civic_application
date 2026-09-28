@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/shared/utils/form_validators.dart';
@@ -42,6 +44,19 @@ mixin PostalCodeCommuneLookup<T extends ConsumerStatefulWidget>
       }
     }
     if (mounted) setState(() => communeNotFound = match == null);
+    if (match == null) _reportProspect(postalCode);
     return match;
+  }
+
+  // Jamais bloquant : la personne voit déjà UnknownCommuneNotice, un échec
+  // de ce signal commercial ne doit ni le lui montrer ni retarder quoi que
+  // ce soit.
+  void _reportProspect(String postalCode) {
+    unawaited(
+      ref
+          .read(authDatasourceProvider)
+          .recordCommuneProspect(postalCode)
+          .catchError((_) {}),
+    );
   }
 }
