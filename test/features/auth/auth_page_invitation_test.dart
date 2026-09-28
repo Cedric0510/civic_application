@@ -1,3 +1,4 @@
+import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/core/auth/token_storage.dart';
 import 'package:civic_app/core/network/api_client.dart';
@@ -7,6 +8,7 @@ import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:civic_app/features/auth/presentation/widgets/unknown_commune_notice.dart';
 import '../../support/preferences_override.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +16,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-const _bessan = CommuneRef(id: 'c1', name: 'Bessan', slug: 'bessan');
+const _bessan = CommuneRef(
+  id: 'c1',
+  name: 'Bessan',
+  slug: 'bessan',
+  postalCode: '34550',
+);
 
 class _RecordingAuthRepository implements AuthRepository {
   int signUpCalls = 0;
@@ -90,7 +97,11 @@ class _SignedOutDatasource extends AuthApiDatasource {
   Future<CitizenSession?> fetchSession() async => null;
 }
 
-Future<_RecordingAuthRepository> _openSignUp(WidgetTester tester) async {
+Future<_RecordingAuthRepository> _openSignUp(
+  WidgetTester tester, {
+  List<CommuneRef> communes = const [_bessan],
+  Object? communesError,
+}) async {
   tester.view.physicalSize = const Size(800, 2200);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -101,7 +112,10 @@ Future<_RecordingAuthRepository> _openSignUp(WidgetTester tester) async {
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
         authDatasourceProvider.overrideWithValue(_SignedOutDatasource()),
-        publicCommunesProvider.overrideWith((ref) async => [_bessan]),
+        publicCommunesProvider.overrideWith((ref) async {
+          if (communesError != null) throw communesError;
+          return communes;
+        }),
         await preferencesOverride(),
       ],
       child: const MaterialApp(home: AuthPage()),
@@ -117,6 +131,7 @@ Future<void> _fillIdentity(
   WidgetTester tester, {
   String emailConfirmation = 'martine@boulangerie.fr',
   String passwordConfirmation = 'motdepasse1',
+  String postalCode = '34550',
 }) async {
   await tester.enterText(
     find.widgetWithText(TextFormField, 'Adresse e-mail'),
@@ -134,10 +149,10 @@ Future<void> _fillIdentity(
     find.widgetWithText(TextFormField, 'Confirmer le mot de passe'),
     passwordConfirmation,
   );
-  await tester.tap(find.byType(DropdownButtonFormField<CommuneRef>));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Bessan').last);
-  await tester.pumpAndSettle();
+  await tester.enterText(
+    find.widgetWithText(TextFormField, 'Code postal'),
+    postalCode,
+  );
   await tester.tap(find.byType(CheckboxListTile));
   await tester.pumpAndSettle();
 }
@@ -350,7 +365,104 @@ void main() {
     });
   });
 
-  testWidgets('asks to choose the commune before reading a legal text', (
+  group('rattachement par code postal', () {
+    testWidgets('asks for a postal code, no more a list of communes', (
+      tester,
+    ) async {
+      await _openSignUp(tester);
+
+      expect(find.text('Code postal'), findsOneWidget);
+      expect(find.byType(DropdownButtonFormField<CommuneRef>), findsNothing);
+    });
+
+    testWidgets('refuses a postal code that is not five digits', (
+      tester,
+    ) async {
+      final repository = await _openSignUp(tester);
+      await _fillIdentity(tester, postalCode: '345');
+
+      await _submit(tester);
+
+      expect(find.text('Entrez un code postal à 5 chiffres.'), findsOneWidget);
+      expect(repository.signUpCalls, 0);
+    });
+
+    testWidgets(
+      'signs up with the commune matching the postal code, unknown to the user',
+      (tester) async {
+        final repository = await _openSignUp(
+          tester,
+          communes: const [
+            _bessan,
+            CommuneRef(
+              id: 'c2',
+              name: 'Villeneuve',
+              slug: 'villeneuve',
+              postalCode: '12260',
+            ),
+          ],
+        );
+        await _fillIdentity(tester, postalCode: '12260');
+
+        await _submit(tester);
+
+        expect(repository.signUpCalls, 1);
+        expect(repository.lastCommuneSlug, 'villeneuve');
+      },
+    );
+
+    testWidgets(
+      'explains that the commune is not a partner yet, and creates no account',
+      (tester) async {
+        final repository = await _openSignUp(tester);
+        await _fillIdentity(tester, postalCode: '99999');
+
+        await _submit(tester);
+
+        expect(find.byType(UnknownCommuneNotice), findsOneWidget);
+        expect(
+          find.textContaining('n\'est pas encore inscrite à City-Co'),
+          findsOneWidget,
+        );
+        expect(find.textContaining(supportEmail), findsOneWidget);
+        expect(repository.signUpCalls, 0);
+      },
+    );
+
+    testWidgets('drops the notice as soon as the postal code is edited', (
+      tester,
+    ) async {
+      await _openSignUp(tester);
+      await _fillIdentity(tester, postalCode: '99999');
+      await _submit(tester);
+      expect(find.byType(UnknownCommuneNotice), findsOneWidget);
+
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Code postal'),
+        '34550',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(UnknownCommuneNotice), findsNothing);
+    });
+
+    testWidgets('reports a failure to reach the server while matching', (
+      tester,
+    ) async {
+      final repository = await _openSignUp(
+        tester,
+        communesError: const NetworkException(),
+      );
+      await _fillIdentity(tester);
+
+      await _submit(tester);
+
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(repository.signUpCalls, 0);
+    });
+  });
+
+  testWidgets('asks for the postal code before reading a legal text', (
     tester,
   ) async {
     await _openSignUp(tester);
@@ -358,9 +470,22 @@ void main() {
     await tester.tap(find.text('Lire : Mentions légales'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Choisissez d\'abord votre commune pour lire ce texte.'),
-      findsOneWidget,
-    );
+    expect(find.text('Saisissez d\'abord votre code postal.'), findsOneWidget);
   });
+
+  testWidgets(
+    'shows the unknown-commune notice when the postal code of a legal text request matches nobody',
+    (tester) async {
+      await _openSignUp(tester);
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Code postal'),
+        '99999',
+      );
+
+      await tester.tap(find.text('Lire : Mentions légales'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(UnknownCommuneNotice), findsOneWidget);
+    },
+  );
 }

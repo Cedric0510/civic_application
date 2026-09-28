@@ -20,6 +20,18 @@ String? validateEmailConfirmation(String? value, String email) {
   return null;
 }
 
+final _postalCodePattern = RegExp(r'^\d{5}$');
+
+String? validatePostalCode(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Le code postal est requis.';
+  }
+  if (!_postalCodePattern.hasMatch(value.trim())) {
+    return 'Entrez un code postal à 5 chiffres.';
+  }
+  return null;
+}
+
 String? validatePasswordConfirmation(String? value, String password) {
   if (value == null || value.isEmpty) {
     return 'Confirmez le mot de passe.';

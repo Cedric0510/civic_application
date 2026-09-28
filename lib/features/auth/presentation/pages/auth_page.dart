@@ -3,8 +3,9 @@ import 'package:civic_app/features/accessibility/presentation/widgets/comfort_mo
 import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:civic_app/features/auth/presentation/widgets/commune_picker_field.dart';
+import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:civic_app/features/auth/presentation/widgets/terms_consent_field.dart';
+import 'package:civic_app/features/auth/presentation/widgets/unknown_commune_notice.dart';
 import 'package:civic_app/features/legal/domain/entities/legal_texts.dart';
 import 'package:civic_app/shared/utils/form_validators.dart';
 import 'package:flutter/material.dart';
@@ -25,11 +26,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   final _passwordController = TextEditingController();
   final _passwordConfirmationController = TextEditingController();
   final _invitationCodeController = TextEditingController();
+  final _postalCodeController = TextEditingController();
   bool _isSignUp = false;
   bool _hasInvitationCode = false;
   bool _acceptedTerms = false;
   bool _obscurePassword = true;
-  CommuneRef? _selectedCommune;
+  bool _communeNotFound = false;
 
   @override
   void dispose() {
@@ -38,7 +40,41 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     _passwordController.dispose();
     _passwordConfirmationController.dispose();
     _invitationCodeController.dispose();
+    _postalCodeController.dispose();
     super.dispose();
+  }
+
+  void _tell(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  // Rattache le compte par code postal plutôt qu'une liste déroulante de
+  // communes : une commune non encore partenaire n'apparaît nulle part,
+  // donc on ne peut la reconnaître qu'en comparant le code postal saisi.
+  Future<CommuneRef?> _resolveCommune() async {
+    final postalCode = _postalCodeController.text.trim();
+    if (validatePostalCode(postalCode) != null) {
+      _tell('Saisissez d\'abord votre code postal.');
+      return null;
+    }
+    final List<CommuneRef> communes;
+    try {
+      communes = await ref.read(publicCommunesProvider.future);
+    } catch (error) {
+      if (mounted) _tell(_mapError(error));
+      return null;
+    }
+    CommuneRef? match;
+    for (final commune in communes) {
+      if (commune.postalCode == postalCode) {
+        match = commune;
+        break;
+      }
+    }
+    if (mounted) setState(() => _communeNotFound = match == null);
+    return match;
   }
 
   Future<void> _submit() async {
@@ -46,12 +82,14 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (_isSignUp) {
+      final commune = await _resolveCommune();
+      if (commune == null) return;
       final pending = await ref
           .read(authControllerProvider.notifier)
           .signUp(
             email: email,
             password: password,
-            communeSlug: _selectedCommune!.slug,
+            communeSlug: commune.slug,
             acceptedTerms: _acceptedTerms,
             invitationCode: _hasInvitationCode
                 ? _invitationCodeController.text
@@ -78,11 +116,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   void _openVerificationWithKnownCode() {
     final email = _emailController.text.trim();
     if (validateEmail(email) != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Saisissez d\'abord votre adresse e-mail.'),
-        ),
-      );
+      _tell('Saisissez d\'abord votre adresse e-mail.');
       return;
     }
     context.go(
@@ -90,18 +124,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     );
   }
 
-  void _openLegalDocument(LegalDocument document) {
-    final commune = _selectedCommune;
-    if (commune == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Choisissez d\'abord votre commune pour lire ce texte.',
-          ),
-        ),
-      );
-      return;
-    }
+  Future<void> _openLegalDocument(LegalDocument document) async {
+    final commune = await _resolveCommune();
+    if (commune == null) return;
+    if (!mounted) return;
     context.push(
       Uri(
         path: '/legal/${document.routeSegment}',
@@ -286,11 +312,29 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               ),
                             if (_isSignUp) ...[
                               const SizedBox(height: 16),
-                              CommunePickerField(
-                                value: _selectedCommune,
-                                onChanged: (commune) =>
-                                    setState(() => _selectedCommune = commune),
+                              TextFormField(
+                                controller: _postalCodeController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Code postal',
+                                  helperText:
+                                      'Sert à retrouver votre commune partenaire.',
+                                  prefixIcon: Icon(Icons.location_on_outlined),
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.number,
+                                maxLength: 5,
+                                autocorrect: false,
+                                validator: validatePostalCode,
+                                onChanged: (_) {
+                                  if (_communeNotFound) {
+                                    setState(() => _communeNotFound = false);
+                                  }
+                                },
                               ),
+                              if (_communeNotFound) ...[
+                                const SizedBox(height: 4),
+                                const UnknownCommuneNotice(),
+                              ],
                               const SizedBox(height: 4),
                               if (_hasInvitationCode) ...[
                                 const SizedBox(height: 12),
@@ -388,6 +432,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                       _isSignUp = !_isSignUp;
                                       _emailConfirmationController.clear();
                                       _passwordConfirmationController.clear();
+                                      _postalCodeController.clear();
+                                      _communeNotFound = false;
                                     }),
                               child: Text(
                                 _isSignUp

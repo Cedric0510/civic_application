@@ -17,7 +17,12 @@ import 'package:http/testing.dart';
 
 import '../../support/preferences_override.dart';
 
-const _bessan = CommuneRef(id: 'c1', name: 'Bessan', slug: 'bessan');
+const _bessan = CommuneRef(
+  id: 'c1',
+  name: 'Bessan',
+  slug: 'bessan',
+  postalCode: '34550',
+);
 const _email = 'martine@boulangerie.fr';
 
 class _Repository implements AuthRepository {
@@ -145,10 +150,10 @@ Future<void> _fillSignUp(WidgetTester tester) async {
     find.widgetWithText(TextFormField, 'Confirmer le mot de passe'),
     'motdepasse1',
   );
-  await tester.tap(find.byType(DropdownButtonFormField<CommuneRef>));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Bessan').last);
-  await tester.pumpAndSettle();
+  await tester.enterText(
+    find.widgetWithText(TextFormField, 'Code postal'),
+    '34550',
+  );
   await tester.tap(find.byType(CheckboxListTile));
   await tester.pumpAndSettle();
 }
