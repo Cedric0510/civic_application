@@ -1,9 +1,8 @@
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/accessibility/presentation/widgets/comfort_mode_tile.dart';
-import 'package:civic_app/features/auth/domain/entities/commune_ref.dart';
 import 'package:civic_app/features/auth/domain/entities/sign_up_outcome.dart';
 import 'package:civic_app/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:civic_app/features/auth/presentation/controllers/auth_providers.dart';
+import 'package:civic_app/features/auth/presentation/widgets/postal_code_commune_lookup.dart';
 import 'package:civic_app/features/auth/presentation/widgets/terms_consent_field.dart';
 import 'package:civic_app/features/auth/presentation/widgets/unknown_commune_notice.dart';
 import 'package:civic_app/features/legal/domain/entities/legal_texts.dart';
@@ -19,7 +18,8 @@ class AuthPage extends ConsumerStatefulWidget {
   ConsumerState<AuthPage> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends ConsumerState<AuthPage> {
+class _AuthPageState extends ConsumerState<AuthPage>
+    with PostalCodeCommuneLookup<AuthPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _emailConfirmationController = TextEditingController();
@@ -31,7 +31,6 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   bool _hasInvitationCode = false;
   bool _acceptedTerms = false;
   bool _obscurePassword = true;
-  bool _communeNotFound = false;
 
   @override
   void dispose() {
@@ -44,45 +43,19 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     super.dispose();
   }
 
-  void _tell(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
+  void _tell(String message) => tellCommuneLookup(message);
 
-  // Rattache le compte par code postal plutôt qu'une liste déroulante de
-  // communes : une commune non encore partenaire n'apparaît nulle part,
-  // donc on ne peut la reconnaître qu'en comparant le code postal saisi.
-  Future<CommuneRef?> _resolveCommune() async {
-    final postalCode = _postalCodeController.text.trim();
-    if (validatePostalCode(postalCode) != null) {
-      _tell('Saisissez d\'abord votre code postal.');
-      return null;
-    }
-    final List<CommuneRef> communes;
-    try {
-      communes = await ref.read(publicCommunesProvider.future);
-    } catch (error) {
-      if (mounted) _tell(_mapError(error));
-      return null;
-    }
-    CommuneRef? match;
-    for (final commune in communes) {
-      if (commune.postalCode == postalCode) {
-        match = commune;
-        break;
-      }
-    }
-    if (mounted) setState(() => _communeNotFound = match == null);
-    return match;
-  }
+  @override
+  String mapCommuneLookupError(Object error) => _mapError(error);
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (_isSignUp) {
-      final commune = await _resolveCommune();
+      final commune = await resolveCommuneByPostalCode(
+        _postalCodeController.text,
+      );
       if (commune == null) return;
       final pending = await ref
           .read(authControllerProvider.notifier)
@@ -125,7 +98,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   }
 
   Future<void> _openLegalDocument(LegalDocument document) async {
-    final commune = await _resolveCommune();
+    final commune = await resolveCommuneByPostalCode(
+      _postalCodeController.text,
+    );
     if (commune == null) return;
     if (!mounted) return;
     context.push(
@@ -326,12 +301,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 autocorrect: false,
                                 validator: validatePostalCode,
                                 onChanged: (_) {
-                                  if (_communeNotFound) {
-                                    setState(() => _communeNotFound = false);
+                                  if (communeNotFound) {
+                                    setState(() => communeNotFound = false);
                                   }
                                 },
                               ),
-                              if (_communeNotFound) ...[
+                              if (communeNotFound) ...[
                                 const SizedBox(height: 4),
                                 const UnknownCommuneNotice(),
                               ],
@@ -433,7 +408,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                       _emailConfirmationController.clear();
                                       _passwordConfirmationController.clear();
                                       _postalCodeController.clear();
-                                      _communeNotFound = false;
+                                      communeNotFound = false;
                                     }),
                               child: Text(
                                 _isSignUp
