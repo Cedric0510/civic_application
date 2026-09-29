@@ -8,6 +8,7 @@ class AppointmentModel extends Appointment {
     required super.startsAt,
     required super.endsAt,
     required super.status,
+    super.visitorName,
     super.message,
   });
 
@@ -19,6 +20,7 @@ class AppointmentModel extends Appointment {
       startsAt: DateTime.parse(json['startsAt'] as String),
       endsAt: DateTime.parse(json['endsAt'] as String),
       status: AppointmentStatus.fromApiValue(json['status'] as String),
+      visitorName: json['visitorName'] as String?,
       message: json['message'] as String?,
     );
   }

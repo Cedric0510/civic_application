@@ -4,6 +4,7 @@ class AppointmentRequestModel extends AppointmentRequest {
   const AppointmentRequestModel({
     required super.serviceId,
     required super.startsAt,
+    required super.visitorName,
     super.message,
   });
 
@@ -11,6 +12,7 @@ class AppointmentRequestModel extends AppointmentRequest {
     return AppointmentRequestModel(
       serviceId: request.serviceId,
       startsAt: request.startsAt,
+      visitorName: request.visitorName,
       message: request.message,
     );
   }
@@ -20,6 +22,7 @@ class AppointmentRequestModel extends AppointmentRequest {
     return {
       'serviceId': serviceId,
       'startsAt': startsAt.toUtc().toIso8601String(),
+      'visitorName': visitorName,
       if (message != null && message!.isNotEmpty) 'message': message,
     };
   }

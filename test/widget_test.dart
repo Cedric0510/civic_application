@@ -63,6 +63,7 @@ void main() {
         'service': {'name': 'Urbanisme'},
         'startsAt': '2026-06-15T07:30:00.000Z',
         'endsAt': '2026-06-15T08:00:00.000Z',
+        'visitorName': 'Jeanne Dupont',
         'message': 'Besoin d un document',
         'status': 'CONFIRME',
       };
@@ -74,21 +75,24 @@ void main() {
       expect(model.serviceName, 'Urbanisme');
       expect(model.startsAt, DateTime.parse('2026-06-15T07:30:00.000Z'));
       expect(model.endsAt, DateTime.parse('2026-06-15T08:00:00.000Z'));
+      expect(model.visitorName, 'Jeanne Dupont');
       expect(model.message, 'Besoin d un document');
       expect(model.status, AppointmentStatus.confirme);
     });
 
-    test('fromJson accepts a missing message', () {
+    test('fromJson accepts a missing message and visitor name', () {
       final model = AppointmentModel.fromJson({
         'id': 'appointment-2',
         'serviceId': 'service-1',
         'service': {'name': 'Urbanisme'},
         'startsAt': '2026-06-15T07:30:00.000Z',
         'endsAt': '2026-06-15T08:00:00.000Z',
+        'visitorName': null,
         'message': null,
         'status': 'DEMANDE',
       });
 
+      expect(model.visitorName, isNull);
       expect(model.message, isNull);
       expect(model.status, AppointmentStatus.demande);
     });
@@ -101,12 +105,14 @@ void main() {
         final model = AppointmentRequestModel(
           serviceId: 'service-1',
           startsAt: DateTime.utc(2026, 6, 15, 7, 30),
+          visitorName: 'Jeanne Dupont',
           message: '',
         );
 
         expect(model.toJson(), {
           'serviceId': 'service-1',
           'startsAt': '2026-06-15T07:30:00.000Z',
+          'visitorName': 'Jeanne Dupont',
         });
       },
     );
@@ -115,6 +121,7 @@ void main() {
       final model = AppointmentRequestModel(
         serviceId: 'service-1',
         startsAt: DateTime.utc(2026, 6, 15, 7, 30),
+        visitorName: 'Jeanne Dupont',
         message: 'Permis',
       );
 

@@ -77,6 +77,7 @@ void main() {
       AppointmentRequestModel(
         serviceId: 'service-1',
         startsAt: DateTime.utc(2026, 10, 14, 7),
+        visitorName: 'Jeanne Dupont',
         message: 'Permis',
       ),
     );
@@ -86,6 +87,7 @@ void main() {
     expect(jsonDecode(sent.body), {
       'serviceId': 'service-1',
       'startsAt': '2026-10-14T07:00:00.000Z',
+      'visitorName': 'Jeanne Dupont',
       'message': 'Permis',
     });
   });

@@ -26,6 +26,7 @@ class Appointment extends Equatable {
     required this.startsAt,
     required this.endsAt,
     required this.status,
+    this.visitorName,
     this.message,
   });
 
@@ -35,6 +36,8 @@ class Appointment extends Equatable {
   final DateTime startsAt;
   final DateTime endsAt;
   final AppointmentStatus status;
+  // Nul pour un rendez-vous pris avant l'ajout de ce champ.
+  final String? visitorName;
   final String? message;
 
   @override
@@ -45,6 +48,7 @@ class Appointment extends Equatable {
     startsAt,
     endsAt,
     status,
+    visitorName,
     message,
   ];
 }

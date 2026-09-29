@@ -18,12 +18,14 @@ class AppointmentForm extends ConsumerStatefulWidget {
 
 class _AppointmentFormState extends ConsumerState<AppointmentForm> {
   final _formKey = GlobalKey<FormState>();
+  final _visitorNameController = TextEditingController();
   final _messageController = TextEditingController();
   String? _selectedServiceId;
   AppointmentSlot? _selectedSlot;
 
   @override
   void dispose() {
+    _visitorNameController.dispose();
     _messageController.dispose();
     super.dispose();
   }
@@ -36,6 +38,7 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
           AppointmentRequest(
             serviceId: _selectedServiceId!,
             startsAt: _selectedSlot!.startsAt,
+            visitorName: _visitorNameController.text.trim(),
             message: _messageController.text.trim().isEmpty
                 ? null
                 : _messageController.text.trim(),
@@ -53,6 +56,7 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
   void _reset() {
     _refreshSlots();
     _formKey.currentState?.reset();
+    _visitorNameController.clear();
     _messageController.clear();
     setState(() => _selectedServiceId = null);
     ref.read(appointmentControllerProvider.notifier).reset();
@@ -96,6 +100,20 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
               _selectedServiceId = value;
               _selectedSlot = null;
             }),
+          ),
+          const SizedBox(height: 20),
+          TextFormField(
+            key: const Key('visitorNameField'),
+            controller: _visitorNameController,
+            decoration: const InputDecoration(
+              labelText: 'Nom de la personne concernée',
+              hintText: 'Pour que l\'agent sache avec qui il a rendez-vous',
+              border: OutlineInputBorder(),
+            ),
+            textCapitalization: TextCapitalization.words,
+            validator: (value) => (value == null || value.trim().isEmpty)
+                ? 'Le nom est requis.'
+                : null,
           ),
           if (serviceId != null) ...[
             const SizedBox(height: 20),
