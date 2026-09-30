@@ -5,6 +5,8 @@ import 'package:civic_app/features/reports/domain/entities/report.dart';
 import 'package:civic_app/features/reports/presentation/controllers/my_reports_controller.dart';
 import 'package:civic_app/features/reports/presentation/controllers/report_controller.dart';
 import 'package:civic_app/features/reports/presentation/widgets/report_category_dropdown.dart';
+import 'package:civic_app/shared/widgets/form_card.dart';
+import 'package:civic_app/shared/widgets/form_section_label.dart';
 import 'package:civic_app/shared/widgets/photo_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -104,44 +106,61 @@ class _ReportFormState extends ConsumerState<ReportForm> {
             ],
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            controller: _addressController,
-            decoration: const InputDecoration(
-              labelText: 'Adresse',
-              border: OutlineInputBorder(),
-              hintText: 'ex. 12 rue de la Mairie',
+          FormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const FormSectionLabel(
+                  icon: Icons.report_problem_outlined,
+                  label: 'Le problème',
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Adresse',
+                    hintText: 'ex. 12 rue de la Mairie',
+                    prefixIcon: Icon(Icons.location_on_outlined),
+                  ),
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Veuillez indiquer une adresse.'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                ReportCategoryDropdown(
+                  value: _selectedCategory,
+                  onChanged: (value) =>
+                      setState(() => _selectedCategory = value),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description du problème',
+                    alignLabelWithHint: true,
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 40),
+                      child: Icon(Icons.description_outlined),
+                    ),
+                  ),
+                  maxLines: 3,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Veuillez décrire le problème.'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                PhotoField(
+                  photo: _photo,
+                  onChanged: (file) => setState(() => _photo = file),
+                ),
+              ],
             ),
-            validator: (value) => (value == null || value.trim().isEmpty)
-                ? 'Veuillez indiquer une adresse.'
-                : null,
-          ),
-          const SizedBox(height: 16),
-          ReportCategoryDropdown(
-            value: _selectedCategory,
-            onChanged: (value) => setState(() => _selectedCategory = value),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              labelText: 'Description du problème',
-              border: OutlineInputBorder(),
-              alignLabelWithHint: true,
-            ),
-            maxLines: 3,
-            validator: (value) => (value == null || value.trim().isEmpty)
-                ? 'Veuillez décrire le problème.'
-                : null,
-          ),
-          const SizedBox(height: 16),
-          PhotoField(
-            photo: _photo,
-            onChanged: (file) => setState(() => _photo = file),
           ),
           const SizedBox(height: 24),
-          FilledButton(
+          FilledButton.icon(
+            style: FilledButton.styleFrom(minimumSize: const Size(64, 52)),
             onPressed: isLoading ? null : _submit,
-            child: isLoading
+            icon: isLoading
                 ? const SizedBox(
                     height: 20,
                     width: 20,
@@ -150,7 +169,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                       strokeWidth: 2,
                     ),
                   )
-                : const Text('Envoyer le signalement'),
+                : const Icon(Icons.send_outlined),
+            label: const Text('Envoyer le signalement'),
           ),
         ],
       ),

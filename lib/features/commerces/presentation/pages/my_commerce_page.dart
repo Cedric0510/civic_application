@@ -25,6 +25,7 @@ class MyCommercePage extends ConsumerWidget {
             title: 'Mon commerce',
             color: FeatureColors.commerces,
             backPath: '/home',
+            icon: Icons.storefront_outlined,
           ),
           commerceAsync.when(
             loading: () => const SliverFillRemaining(

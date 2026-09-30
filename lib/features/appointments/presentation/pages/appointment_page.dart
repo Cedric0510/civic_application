@@ -15,6 +15,7 @@ class AppointmentPage extends StatelessWidget {
             title: 'Rendez-vous',
             color: FeatureColors.appointments,
             backPath: '/home',
+            icon: Icons.calendar_month_outlined,
           ),
           const SliverToBoxAdapter(
             child: Padding(

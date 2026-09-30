@@ -152,7 +152,6 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             decoration: const InputDecoration(
               labelText: 'Adresse e-mail',
               prefixIcon: Icon(Icons.email_outlined),
-              border: OutlineInputBorder(),
             ),
             keyboardType: TextInputType.emailAddress,
             autocorrect: false,
@@ -196,7 +195,6 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             decoration: const InputDecoration(
               labelText: 'Code reçu par e-mail',
               prefixIcon: Icon(Icons.pin_outlined),
-              border: OutlineInputBorder(),
             ),
             textCapitalization: TextCapitalization.characters,
             autocorrect: false,
@@ -213,7 +211,6 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             decoration: InputDecoration(
               labelText: 'Nouveau mot de passe',
               prefixIcon: const Icon(Icons.lock_outline),
-              border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 tooltip: _obscurePassword
                     ? 'Afficher le mot de passe'
@@ -242,7 +239,6 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             decoration: const InputDecoration(
               labelText: 'Confirmer le mot de passe',
               prefixIcon: Icon(Icons.lock_outline),
-              border: OutlineInputBorder(),
             ),
             obscureText: _obscurePassword,
             validator: (value) {

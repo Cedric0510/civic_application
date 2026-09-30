@@ -53,6 +53,8 @@ class PhotoField extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasPhoto = photo != null || existingImageUrl != null;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -94,26 +96,36 @@ class PhotoField extends StatelessWidget {
             ],
           )
         else
-          InkWell(
-            onTap: () => _pick(context),
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              height: 100,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add_a_photo_outlined, color: Colors.grey.shade500),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Ajouter une photo',
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
-                  ),
-                ],
+          Material(
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              onTap: () => _pick(context),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                height: 100,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: colorScheme.outlineVariant),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_a_photo_outlined,
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Ajouter une photo',
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -182,12 +194,13 @@ class _PhotoPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       height: 160,
-      color: Colors.grey.shade200,
+      color: colorScheme.surfaceContainerHighest,
       child: Icon(
         Icons.image_not_supported_outlined,
-        color: Colors.grey.shade400,
+        color: colorScheme.outline,
       ),
     );
   }

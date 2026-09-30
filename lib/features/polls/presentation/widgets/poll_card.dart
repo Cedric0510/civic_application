@@ -33,8 +33,11 @@ class PollCard extends ConsumerWidget {
     final scheduleMessage = _scheduleMessage();
     final isWaitingToVote = ref.watch(voteWaitingUntilProvider) != null;
 
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 1,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -50,9 +53,9 @@ class PollCard extends ConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 scheduleMessage,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
             const SizedBox(height: 12),

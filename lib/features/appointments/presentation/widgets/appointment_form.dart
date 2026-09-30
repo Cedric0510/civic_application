@@ -6,6 +6,8 @@ import 'package:civic_app/features/appointments/presentation/controllers/appoint
 import 'package:civic_app/features/appointments/presentation/widgets/service_dropdown.dart';
 import 'package:civic_app/features/appointments/presentation/widgets/slot_picker.dart';
 import 'package:civic_app/shared/widgets/error_retry_widget.dart';
+import 'package:civic_app/shared/widgets/form_card.dart';
+import 'package:civic_app/shared/widgets/form_section_label.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -95,65 +97,98 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ServiceDropdown(
-            onChanged: (value) => setState(() {
-              _selectedServiceId = value;
-              _selectedSlot = null;
-            }),
-          ),
-          const SizedBox(height: 20),
-          TextFormField(
-            key: const Key('visitorNameField'),
-            controller: _visitorNameController,
-            decoration: const InputDecoration(
-              labelText: 'Nom de la personne concernée',
-              hintText: 'Pour que l\'agent sache avec qui il a rendez-vous',
-              border: OutlineInputBorder(),
+          FormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const FormSectionLabel(
+                  icon: Icons.business_outlined,
+                  label: 'Service concerné',
+                ),
+                const SizedBox(height: 12),
+                ServiceDropdown(
+                  onChanged: (value) => setState(() {
+                    _selectedServiceId = value;
+                    _selectedSlot = null;
+                  }),
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  key: const Key('visitorNameField'),
+                  controller: _visitorNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nom de la personne concernée',
+                    hintText:
+                        'Pour que l\'agent sache avec qui il a rendez-vous',
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  textCapitalization: TextCapitalization.words,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Le nom est requis.'
+                      : null,
+                ),
+              ],
             ),
-            textCapitalization: TextCapitalization.words,
-            validator: (value) => (value == null || value.trim().isEmpty)
-                ? 'Le nom est requis.'
-                : null,
           ),
           if (serviceId != null) ...[
-            const SizedBox(height: 20),
-            ref
-                .watch(appointmentSlotsProvider(serviceId))
-                .when(
-                  loading: () => const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: CircularProgressIndicator(
-                        semanticsLabel: 'Chargement en cours',
+            const SizedBox(height: 16),
+            FormCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const FormSectionLabel(
+                    icon: Icons.event_outlined,
+                    label: 'Créneau souhaité',
+                  ),
+                  const SizedBox(height: 12),
+                  ref
+                      .watch(appointmentSlotsProvider(serviceId))
+                      .when(
+                        loading: () => const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: CircularProgressIndicator(
+                              semanticsLabel: 'Chargement en cours',
+                            ),
+                          ),
+                        ),
+                        error: (error, stackTrace) => ErrorRetryWidget(
+                          message: 'Impossible de charger les créneaux.',
+                          onRetry: () => ref.invalidate(
+                            appointmentSlotsProvider(serviceId),
+                          ),
+                        ),
+                        data: (slots) => SlotPicker(
+                          slots: slots,
+                          selected: _selectedSlot,
+                          onSelected: (slot) =>
+                              setState(() => _selectedSlot = slot),
+                        ),
                       ),
-                    ),
-                  ),
-                  error: (error, stackTrace) => ErrorRetryWidget(
-                    message: 'Impossible de charger les créneaux.',
-                    onRetry: () =>
-                        ref.invalidate(appointmentSlotsProvider(serviceId)),
-                  ),
-                  data: (slots) => SlotPicker(
-                    slots: slots,
-                    selected: _selectedSlot,
-                    onSelected: (slot) => setState(() => _selectedSlot = slot),
-                  ),
-                ),
-          ],
-          const SizedBox(height: 20),
-          TextFormField(
-            controller: _messageController,
-            decoration: const InputDecoration(
-              labelText: 'Message (facultatif)',
-              border: OutlineInputBorder(),
-              alignLabelWithHint: true,
+                ],
+              ),
             ),
-            maxLines: 3,
+          ],
+          const SizedBox(height: 16),
+          FormCard(
+            child: TextFormField(
+              controller: _messageController,
+              decoration: const InputDecoration(
+                labelText: 'Message (facultatif)',
+                alignLabelWithHint: true,
+                prefixIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 40),
+                  child: Icon(Icons.chat_bubble_outline),
+                ),
+              ),
+              maxLines: 3,
+            ),
           ),
           const SizedBox(height: 24),
-          FilledButton(
+          FilledButton.icon(
+            style: FilledButton.styleFrom(minimumSize: const Size(64, 52)),
             onPressed: isLoading || _selectedSlot == null ? null : _submit,
-            child: isLoading
+            icon: isLoading
                 ? const SizedBox(
                     height: 20,
                     width: 20,
@@ -162,7 +197,8 @@ class _AppointmentFormState extends ConsumerState<AppointmentForm> {
                       strokeWidth: 2,
                     ),
                   )
-                : const Text('Prendre rendez-vous'),
+                : const Icon(Icons.event_available_outlined),
+            label: const Text('Prendre rendez-vous'),
           ),
         ],
       ),

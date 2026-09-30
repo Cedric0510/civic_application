@@ -1,4 +1,5 @@
 import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/empty_state_message.dart';
 import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/services/presentation/controllers/services_controller.dart';
 import 'package:civic_app/features/services/presentation/widgets/service_card.dart';
@@ -23,6 +24,7 @@ class ServicesPage extends ConsumerWidget {
               title: 'Services',
               color: FeatureColors.services,
               backPath: '/home',
+              icon: Icons.location_city_outlined,
             ),
             state.when(
               loading: () => const SliverFillRemaining(
@@ -39,22 +41,12 @@ class ServicesPage extends ConsumerWidget {
                 ),
               ),
               data: (services) => services.isEmpty
-                  ? SliverFillRemaining(
+                  ? const SliverFillRemaining(
                       child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.location_city_outlined,
-                              size: 64,
-                              color: Colors.grey.shade300,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Aucun service disponible.',
-                              style: TextStyle(color: Colors.grey.shade500),
-                            ),
-                          ],
+                        child: EmptyStateMessage(
+                          icon: Icons.location_city_outlined,
+                          color: FeatureColors.services,
+                          message: 'Aucun service disponible.',
                         ),
                       ),
                     )

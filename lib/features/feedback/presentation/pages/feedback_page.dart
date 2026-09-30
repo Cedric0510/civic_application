@@ -159,7 +159,6 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
             decoration: const InputDecoration(
               labelText: 'Votre message',
               alignLabelWithHint: true,
-              border: OutlineInputBorder(),
             ),
             minLines: 4,
             maxLines: 8,

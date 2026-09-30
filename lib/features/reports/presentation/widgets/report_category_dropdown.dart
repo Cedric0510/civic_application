@@ -17,7 +17,7 @@ class ReportCategoryDropdown extends StatelessWidget {
       initialValue: value,
       decoration: const InputDecoration(
         labelText: 'Catégorie',
-        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.category_outlined),
       ),
       items: ReportCategory.values
           .map(

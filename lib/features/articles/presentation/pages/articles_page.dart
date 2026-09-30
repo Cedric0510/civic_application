@@ -1,4 +1,5 @@
 import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/empty_state_message.dart';
 import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/articles/presentation/controllers/articles_controller.dart';
 import 'package:civic_app/features/articles/presentation/widgets/article_card.dart';
@@ -31,6 +32,7 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
               title: 'Actualités',
               color: FeatureColors.articles,
               backPath: '/home',
+              icon: Icons.article_outlined,
             ),
             state.when(
               loading: () => const SliverFillRemaining(
@@ -64,7 +66,13 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
 
                 if (articles.isEmpty) {
                   return const SliverFillRemaining(
-                    child: Center(child: Text('Aucun article disponible.')),
+                    child: Center(
+                      child: EmptyStateMessage(
+                        icon: Icons.article_outlined,
+                        color: FeatureColors.articles,
+                        message: 'Aucun article disponible.',
+                      ),
+                    ),
                   );
                 }
 
@@ -103,7 +111,11 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
                     if (filtered.isEmpty)
                       const SliverFillRemaining(
                         child: Center(
-                          child: Text('Aucun article dans cette catégorie.'),
+                          child: EmptyStateMessage(
+                            icon: Icons.article_outlined,
+                            color: FeatureColors.articles,
+                            message: 'Aucun article dans cette catégorie.',
+                          ),
                         ),
                       )
                     else

@@ -15,7 +15,7 @@ class ServiceDropdown extends ConsumerWidget {
       loading: () => const InputDecorator(
         decoration: InputDecoration(
           labelText: 'Service',
-          border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.business_outlined),
         ),
         child: SizedBox(
           height: 20,
@@ -29,7 +29,7 @@ class ServiceDropdown extends ConsumerWidget {
       error: (error, stackTrace) => const InputDecorator(
         decoration: InputDecoration(
           labelText: 'Service',
-          border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.business_outlined),
           errorText: 'Impossible de charger les services.',
         ),
         child: SizedBox.shrink(),
@@ -38,7 +38,7 @@ class ServiceDropdown extends ConsumerWidget {
         initialValue: null,
         decoration: const InputDecoration(
           labelText: 'Service',
-          border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.business_outlined),
         ),
         items: services
             .map(

@@ -1,5 +1,8 @@
+import 'package:civic_app/core/theme/feature_colors.dart';
 import 'package:civic_app/features/commerces/domain/entities/commerce.dart';
 import 'package:civic_app/shared/utils/contact_launcher.dart';
+import 'package:civic_app/shared/widgets/category_pill.dart';
+import 'package:civic_app/shared/widgets/feature_icon_avatar.dart';
 import 'package:civic_app/shared/widgets/info_row.dart';
 import 'package:flutter/material.dart';
 
@@ -8,8 +11,8 @@ class CommerceCard extends StatelessWidget {
 
   final Commerce commerce;
 
-  static const Color _accentColor = Color(0xFF00897B);
-  static const Color _notesColor = Color(0xFFFB8C00);
+  static const Color _accentColor = FeatureColors.commerces;
+  static const Color _notesColor = Color(0xFFC2410C);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class CommerceCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 2,
+      elevation: 1,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -44,7 +47,15 @@ class CommerceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (commerce.imageUrl == null) ...[
+                      const FeatureIconAvatar(
+                        icon: Icons.storefront_outlined,
+                        color: _accentColor,
+                      ),
+                      const SizedBox(width: 12),
+                    ],
                     Expanded(
                       child: Text(
                         commerce.name,
@@ -55,34 +66,21 @@ class CommerceCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (commerce.category != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _accentColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          commerce.category!,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.copyWith(
-                            color: _accentColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    if (commerce.category != null) ...[
+                      const SizedBox(width: 8),
+                      CategoryPill(
+                        label: commerce.category!,
+                        color: _accentColor,
                       ),
+                    ],
                   ],
                 ),
                 if (commerce.description != null) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
                     commerce.description!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],

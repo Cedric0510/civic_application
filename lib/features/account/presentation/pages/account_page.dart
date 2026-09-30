@@ -68,6 +68,7 @@ class AccountPage extends ConsumerWidget {
               title: 'Mon compte',
               color: FeatureColors.account,
               backPath: '/home',
+              icon: Icons.account_circle_outlined,
             ),
             SliverToBoxAdapter(
               child: Padding(

@@ -3,6 +3,8 @@ import 'package:cross_file/cross_file.dart';
 import 'package:civic_app/core/errors/app_exception.dart';
 import 'package:civic_app/features/commerces/domain/entities/commerce.dart';
 import 'package:civic_app/features/commerces/presentation/controllers/my_commerce_controller.dart';
+import 'package:civic_app/shared/widgets/form_card.dart';
+import 'package:civic_app/shared/widgets/form_section_label.dart';
 import 'package:civic_app/shared/widgets/photo_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -103,115 +105,151 @@ class _MyCommerceFormState extends ConsumerState<MyCommerceForm> {
     });
 
     final isLoading = ref.watch(myCommerceControllerProvider).isLoading;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TextFormField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Nom du commerce',
-              border: OutlineInputBorder(),
+          FormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const FormSectionLabel(
+                  icon: Icons.storefront_outlined,
+                  label: 'Informations générales',
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nom du commerce',
+                    prefixIcon: Icon(Icons.storefront_outlined),
+                  ),
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Le nom est requis.'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _categoryController,
+                  decoration: const InputDecoration(
+                    labelText: 'Catégorie',
+                    hintText: 'ex. Alimentation, Maison, Services, Santé…',
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    alignLabelWithHint: true,
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 40),
+                      child: Icon(Icons.description_outlined),
+                    ),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
             ),
-            validator: (value) => (value == null || value.trim().isEmpty)
-                ? 'Le nom est requis.'
-                : null,
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            controller: _categoryController,
-            decoration: const InputDecoration(
-              labelText: 'Catégorie',
-              border: OutlineInputBorder(),
-              hintText: 'ex. Alimentation, Maison, Services, Santé…',
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              labelText: 'Description',
-              border: OutlineInputBorder(),
-              alignLabelWithHint: true,
-            ),
-            maxLines: 3,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
+          FormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const FormSectionLabel(
+                  icon: Icons.contact_phone_outlined,
+                  label: 'Coordonnées',
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
                   controller: _phoneController,
                   decoration: const InputDecoration(
                     labelText: 'Téléphone',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.phone_outlined),
                   ),
                   keyboardType: TextInputType.phone,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
+                const SizedBox(height: 16),
+                TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _hoursController,
-            decoration: const InputDecoration(
-              labelText: 'Horaires',
-              border: OutlineInputBorder(),
-              hintText: 'ex. Lun-Sam 7h-19h',
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Adresse',
+                    prefixIcon: Icon(Icons.location_on_outlined),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _hoursController,
+                  decoration: const InputDecoration(
+                    labelText: 'Horaires',
+                    hintText: 'ex. Lun-Sam 7h-19h',
+                    prefixIcon: Icon(Icons.access_time_outlined),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            controller: _addressController,
-            decoration: const InputDecoration(
-              labelText: 'Adresse',
-              border: OutlineInputBorder(),
+          FormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const FormSectionLabel(
+                  icon: Icons.campaign_outlined,
+                  label: 'Fiche publique',
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Notes (visible publiquement)',
+                    alignLabelWithHint: true,
+                    hintText:
+                        'ex. Congés annuels du 12 au 25 juillet, promotion du moment…',
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 40),
+                      child: Icon(Icons.edit_note_outlined),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Affiché sur votre fiche publique — à tenir à jour (congés, '
+                  'promotions, actualités).',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                PhotoField(
+                  photo: _photo,
+                  existingImageUrl: widget.commerce.imageUrl,
+                  label: 'Photo',
+                  onChanged: (file) => setState(() => _photo = file),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _notesController,
-            decoration: const InputDecoration(
-              labelText: 'Notes (visible publiquement)',
-              border: OutlineInputBorder(),
-              alignLabelWithHint: true,
-              hintText:
-                  'ex. Congés annuels du 12 au 25 juillet, promotion du moment…',
-            ),
-            maxLines: 2,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Affiché sur votre fiche publique — à tenir à jour (congés, '
-            'promotions, actualités).',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
-          ),
-          const SizedBox(height: 16),
-          PhotoField(
-            photo: _photo,
-            existingImageUrl: widget.commerce.imageUrl,
-            label: 'Photo',
-            onChanged: (file) => setState(() => _photo = file),
           ),
           const SizedBox(height: 24),
-          FilledButton(
+          FilledButton.icon(
+            style: FilledButton.styleFrom(minimumSize: const Size(64, 52)),
             onPressed: isLoading ? null : _submit,
-            child: isLoading
+            icon: isLoading
                 ? const SizedBox(
                     height: 20,
                     width: 20,
@@ -220,7 +258,8 @@ class _MyCommerceFormState extends ConsumerState<MyCommerceForm> {
                       strokeWidth: 2,
                     ),
                   )
-                : const Text('Enregistrer'),
+                : const Icon(Icons.save_outlined),
+            label: const Text('Enregistrer'),
           ),
         ],
       ),

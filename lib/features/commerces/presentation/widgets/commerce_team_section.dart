@@ -153,7 +153,6 @@ class _CommerceTeamSectionState extends ConsumerState<CommerceTeamSection> {
                       'suite ; sinon il reçoit un code par e-mail.',
                   helperMaxLines: 3,
                   prefixIcon: Icon(Icons.person_add_alt_outlined),
-                  border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 autocorrect: false,

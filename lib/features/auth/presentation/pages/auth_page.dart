@@ -201,7 +201,6 @@ class _AuthPageState extends ConsumerState<AuthPage>
                               decoration: const InputDecoration(
                                 labelText: 'Adresse e-mail',
                                 prefixIcon: Icon(Icons.email_outlined),
-                                border: OutlineInputBorder(),
                               ),
                               keyboardType: TextInputType.emailAddress,
                               autocorrect: false,
@@ -216,7 +215,6 @@ class _AuthPageState extends ConsumerState<AuthPage>
                                   prefixIcon: Icon(
                                     Icons.mark_email_read_outlined,
                                   ),
-                                  border: OutlineInputBorder(),
                                 ),
                                 keyboardType: TextInputType.emailAddress,
                                 autocorrect: false,
@@ -232,7 +230,6 @@ class _AuthPageState extends ConsumerState<AuthPage>
                               decoration: InputDecoration(
                                 labelText: 'Mot de passe',
                                 prefixIcon: const Icon(Icons.lock_outline),
-                                border: const OutlineInputBorder(),
                                 suffixIcon: IconButton(
                                   tooltip: _obscurePassword
                                       ? 'Afficher le mot de passe'
@@ -265,7 +262,6 @@ class _AuthPageState extends ConsumerState<AuthPage>
                                 decoration: const InputDecoration(
                                   labelText: 'Confirmer le mot de passe',
                                   prefixIcon: Icon(Icons.lock_reset_outlined),
-                                  border: OutlineInputBorder(),
                                 ),
                                 obscureText: _obscurePassword,
                                 validator: (value) =>
@@ -294,7 +290,6 @@ class _AuthPageState extends ConsumerState<AuthPage>
                                   helperText:
                                       'Sert à retrouver votre commune partenaire.',
                                   prefixIcon: Icon(Icons.location_on_outlined),
-                                  border: OutlineInputBorder(),
                                 ),
                                 keyboardType: TextInputType.number,
                                 maxLength: 5,
@@ -321,7 +316,6 @@ class _AuthPageState extends ConsumerState<AuthPage>
                                         'Reçu par e-mail de votre mairie pour gérer un commerce.',
                                     helperMaxLines: 2,
                                     prefixIcon: Icon(Icons.storefront_outlined),
-                                    border: OutlineInputBorder(),
                                   ),
                                   textCapitalization:
                                       TextCapitalization.characters,

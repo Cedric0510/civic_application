@@ -158,7 +158,6 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
                         labelText: 'Code de vérification',
                         hintText: 'XXXX-XXXX',
                         prefixIcon: Icon(Icons.pin_outlined),
-                        border: OutlineInputBorder(),
                       ),
                       textCapitalization: TextCapitalization.characters,
                       autocorrect: false,

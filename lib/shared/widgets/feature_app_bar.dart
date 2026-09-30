@@ -9,6 +9,7 @@ class FeatureAppBar extends StatelessWidget {
     this.backPath = '/home',
     this.expandedHeight = 80,
     this.background,
+    this.icon,
   });
 
   final String title;
@@ -16,6 +17,11 @@ class FeatureAppBar extends StatelessWidget {
   final String backPath;
   final double expandedHeight;
   final Widget? background;
+
+  // Grand pictogramme en filigrane derrière le titre : donne une identité
+  // propre à chaque rubrique au lieu d'un simple bandeau de couleur unie.
+  // Ignoré si `background` est fourni (ex. photo d'un article).
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +50,43 @@ class FeatureAppBar extends StatelessWidget {
           ),
         ),
         titlePadding: const EdgeInsets.only(left: 56, bottom: 12),
-        background: background ?? ColoredBox(color: color),
+        background: background ?? _DefaultBackground(color: color, icon: icon),
       ),
+    );
+  }
+}
+
+class _DefaultBackground extends StatelessWidget {
+  const _DefaultBackground({required this.color, required this.icon});
+
+  final Color color;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final watermarkIcon = icon;
+    return ColoredBox(
+      color: color,
+      // Stack.hardEdge (le défaut) rogne le pictogramme aux limites de la
+      // barre, d'où le débordement volontaire en Positioned négatif.
+      child: watermarkIcon == null
+          ? null
+          : Stack(
+              children: [
+                Positioned(
+                  right: -24,
+                  bottom: -24,
+                  child: Transform.rotate(
+                    angle: -0.35,
+                    child: Icon(
+                      watermarkIcon,
+                      size: 160,
+                      color: Colors.white.withValues(alpha: 0.14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

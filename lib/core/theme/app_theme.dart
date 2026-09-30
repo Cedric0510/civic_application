@@ -3,14 +3,47 @@ import 'package:flutter/material.dart';
 abstract final class AppTheme {
   static const Color seed = Color(0xFF1E5FA6);
 
-  static ThemeData get light => ThemeData(
-    useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(seedColor: seed),
-    appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-    navigationBarTheme: const NavigationBarThemeData(
-      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-    ),
-  );
+  static ThemeData get light {
+    final scheme = ColorScheme.fromSeed(seedColor: seed);
+    final fieldShape = BorderRadius.circular(14);
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
+      navigationBarTheme: const NavigationBarThemeData(
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+        border: OutlineInputBorder(
+          borderRadius: fieldShape,
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: fieldShape,
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: fieldShape,
+          borderSide: BorderSide(color: scheme.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: fieldShape,
+          borderSide: BorderSide(color: scheme.error, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: fieldShape,
+          borderSide: BorderSide(color: scheme.error, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+      ),
+    );
+  }
 
   static ThemeData get comfort {
     final scheme = ColorScheme.fromSeed(seedColor: seed, contrastLevel: 1);

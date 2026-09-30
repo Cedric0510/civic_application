@@ -1,4 +1,5 @@
 import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/empty_state_message.dart';
 import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/commerces/presentation/controllers/commerces_controller.dart';
 import 'package:civic_app/features/commerces/presentation/widgets/commerce_card.dart';
@@ -23,6 +24,7 @@ class CommercesPage extends ConsumerWidget {
               title: 'Commerçants',
               color: FeatureColors.commerces,
               backPath: '/home',
+              icon: Icons.storefront_outlined,
             ),
             state.when(
               loading: () => const SliverFillRemaining(
@@ -39,22 +41,12 @@ class CommercesPage extends ConsumerWidget {
                 ),
               ),
               data: (commerces) => commerces.isEmpty
-                  ? SliverFillRemaining(
+                  ? const SliverFillRemaining(
                       child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.storefront_outlined,
-                              size: 64,
-                              color: Colors.grey.shade300,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Aucun commerçant disponible.',
-                              style: TextStyle(color: Colors.grey.shade500),
-                            ),
-                          ],
+                        child: EmptyStateMessage(
+                          icon: Icons.storefront_outlined,
+                          color: FeatureColors.commerces,
+                          message: 'Aucun commerçant disponible.',
                         ),
                       ),
                     )

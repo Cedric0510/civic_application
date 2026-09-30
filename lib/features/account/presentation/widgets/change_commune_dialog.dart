@@ -77,7 +77,6 @@ class _ChangeCommuneDialogState extends ConsumerState<_ChangeCommuneDialog>
                 helperText:
                     'Sert à retrouver votre nouvelle commune partenaire.',
                 prefixIcon: Icon(Icons.location_on_outlined),
-                border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
               maxLength: 5,

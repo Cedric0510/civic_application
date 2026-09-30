@@ -20,7 +20,7 @@ class InfoRow extends StatelessWidget {
           Icon(
             icon,
             size: 16,
-            color: isTappable ? colorScheme.primary : Colors.grey.shade500,
+            color: isTappable ? colorScheme.primary : colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 8),
           Expanded(

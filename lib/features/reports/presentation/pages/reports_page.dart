@@ -1,5 +1,6 @@
 import 'package:civic_app/shared/widgets/section_title.dart';
 import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/empty_state_message.dart';
 import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/reports/presentation/controllers/my_reports_controller.dart';
 import 'package:civic_app/features/reports/presentation/widgets/report_card.dart';
@@ -25,6 +26,7 @@ class ReportsPage extends ConsumerWidget {
               title: 'Signalements',
               color: FeatureColors.reports,
               backPath: '/home',
+              icon: Icons.report_problem_outlined,
             ),
             const SliverToBoxAdapter(
               child: Padding(padding: EdgeInsets.all(20), child: ReportForm()),
@@ -56,27 +58,12 @@ class ReportsPage extends ConsumerWidget {
                 ),
               ),
               data: (reports) => reports.isEmpty
-                  ? SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 24,
-                        ),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.check_circle_outline,
-                                size: 48,
-                                color: Colors.grey.shade300,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Aucun signalement pour le moment.',
-                                style: TextStyle(color: Colors.grey.shade500),
-                              ),
-                            ],
-                          ),
+                  ? const SliverToBoxAdapter(
+                      child: Center(
+                        child: EmptyStateMessage(
+                          icon: Icons.check_circle_outline,
+                          color: FeatureColors.reports,
+                          message: 'Aucun signalement pour le moment.',
                         ),
                       ),
                     )

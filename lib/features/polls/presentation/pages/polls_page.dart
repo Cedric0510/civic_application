@@ -1,4 +1,5 @@
 import 'package:civic_app/core/theme/feature_colors.dart';
+import 'package:civic_app/shared/widgets/empty_state_message.dart';
 import 'package:civic_app/shared/widgets/feature_app_bar.dart';
 import 'package:civic_app/features/polls/presentation/controllers/polls_controller.dart';
 import 'package:civic_app/features/polls/presentation/controllers/polls_providers.dart';
@@ -26,6 +27,7 @@ class PollsPage extends ConsumerWidget {
               title: 'Sondages',
               color: FeatureColors.polls,
               backPath: '/home',
+              icon: Icons.poll_outlined,
             ),
             if (waitingUntil != null)
               SliverToBoxAdapter(
@@ -47,7 +49,13 @@ class PollsPage extends ConsumerWidget {
               ),
               data: (polls) => polls.isEmpty
                   ? const SliverFillRemaining(
-                      child: Center(child: Text('Aucun sondage disponible.')),
+                      child: Center(
+                        child: EmptyStateMessage(
+                          icon: Icons.poll_outlined,
+                          color: FeatureColors.polls,
+                          message: 'Aucun sondage disponible.',
+                        ),
+                      ),
                     )
                   : SliverPadding(
                       padding: const EdgeInsets.all(16),
